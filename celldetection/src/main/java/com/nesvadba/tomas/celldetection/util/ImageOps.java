@@ -9,10 +9,13 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import com.nesvadba.tomas.celldetection.domain.ImageStats;
+import com.nesvadba.tomas.celldetection.domain.Yeast;
+
 public class ImageOps {
 
     private static final Logger LOGGER = Logger.getLogger(ImageOps.class);
-    private static Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(new Point(12.0, 12.0)));
+
     private static Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(new Point(13.0, 13.0)));
 
     public static Mat denoise(Mat src) {
@@ -82,23 +85,141 @@ public class ImageOps {
 	return dst;
     }
 
-    public static Mat whaterShaded(Mat src) {
+    public static ImageStats getFlou1Stats(Mat src) {
+
+	Mat gray = new Mat(src.size(), CvType.CV_8UC3);
+
+	Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY);
+
+	Mat denoise = new Mat();
+	Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)), 5);
+
+	Mat bin = new Mat();
+	Imgproc.threshold(denoise, bin, 0, 255, Imgproc.THRESH_TRIANGLE + Imgproc.THRESH_BINARY);
+
+	return getStats(bin);
+    }
+
+    public static ImageStats getFlou2Stats(Mat src) {
+
+	Mat gray = new Mat(src.size(), CvType.CV_8UC3);
+
+	Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY);
+
+	Mat denoise = new Mat();
+	Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)), 5);
+
+	Mat bin = new Mat();
+	Imgproc.threshold(denoise, bin, 0, 255, Imgproc.THRESH_TRIANGLE + Imgproc.THRESH_BINARY);
+
+	Mat topHap = new Mat();
+	Imgproc.morphologyEx(bin, topHap, Imgproc.MORPH_ERODE, Mat.ones(new Size(3, 3), CvType.CV_8U));
+
+	Core.absdiff(bin, topHap, topHap);
+
+	// for (int i = 0 )
+	// Core.add(, src2, dst);
+
+	Core.add(topHap, gray, gray, new Mat(), CvType.CV_8UC3);
+	double maxSum = Core.norm(gray, Core.NORM_INF);
+
+	ImageStats stats = new ImageStats();
+	stats.setLabels(gray);
+	return stats;// getStats(bin);
+    }
+
+    /**
+     * Fuknce urcena k zistakni statistik o celém obrazu ve chvili kdy je
+     * segmentace hotová - lze použít connected components.
+     * 
+     * @param src
+     * @return
+     * 
+     */
+    public static ImageStats getStats(Mat src) {
 
 	Mat labels = new Mat();
-	Mat dst = new Mat();
-	src.convertTo(dst, CvType.CV_8UC3);
-	Imgproc.connectedComponents(dst, labels, 8, CvType.CV_32SC1);
+	Mat stats = new Mat();
+	Mat centroids = new Mat();
+	Imgproc.connectedComponentsWithStats(src, labels, stats, centroids);
+	labels.convertTo(labels, CvType.CV_8UC1);
 
-	Mat labels2 = new Mat();
-	Mat dst2 = new Mat(src.size(), CvType.CV_8UC3);
-	labels.convertTo(labels2, CvType.CV_32SC1);
+	ImageStats imageStats = new ImageStats();
 
-	// Imgproc.watershed(dst2, labels2);
+	for (int count = 0; count < stats.size().height; count++) {
 
-	labels.convertTo(labels, CvType.CV_8UC3);
+	    Yeast yeast = new Yeast();
+	    yeast.setId(count);
+	    yeast.getParametrs().put("CC_STAT_LEFT", stats.get(count, 0)[0]);
+	    yeast.getParametrs().put("CC_STAT_TOP", stats.get(count, 1)[0]);
+	    yeast.getParametrs().put("CC_STAT_WIDTH", stats.get(count, 2)[0]);
+	    yeast.getParametrs().put("CC_STAT_HEIGHT", stats.get(count, 3)[0]);
+	    yeast.getParametrs().put("CC_STAT_AREA", stats.get(count, 4)[0]);
 
-	return labels;
+	    yeast.getParametrs().put("Centr X", centroids.get(count, 0)[0]);
+	    yeast.getParametrs().put("Centr Y", centroids.get(count, 1)[0]);
 
+	    imageStats.getYeasts().add(yeast);
+
+	}
+	imageStats.setLabels(labels);
+
+	return imageStats;
     }
+
+    // Mat gray = new Mat(src.size(), CvType.CV_8UC3);
+    //
+    // Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY);
+    // LOGGER.debug("1. Grayscale " + CvType.typeToString(gray.type()));
+    // //
+    // =========================================================================================
+    // Mat denoise = new Mat();
+    // Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)),
+    // 5);
+    // LOGGER.debug("2. Denoise " + CvType.typeToString(denoise.type()));
+    // //
+    // =========================================================================================
+    // Mat bin = new Mat();
+    // Imgproc.threshold(denoise, bin, 0, 255, Imgproc.THRESH_TRIANGLE);
+    // LOGGER.debug("3. Threshold " + CvType.typeToString(bin.type()));
+    // //
+    // =========================================================================================
+    // Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new
+    // Size(3, 3)); // 19,19
+    // Mat ret = new Mat(src.size(), CvType.CV_8U);
+    // Imgproc.morphologyEx(bin, ret, Imgproc.MORPH_OPEN, kernel);
+    //
+    // // Sure background area
+    // Mat sure_bg = new Mat(src.size(), CvType.CV_8U);
+    // Imgproc.dilate(ret, sure_bg, new Mat(), new Point(-1, -1), 3);
+    // Imgproc.threshold(sure_bg, sure_bg, 1, 128,
+    // Imgproc.THRESH_BINARY_INV);
+    //
+    // Mat sure_fg = new Mat(src.size(), CvType.CV_8U);
+    // Imgproc.distanceTransform(bin, sure_fg, Imgproc.CV_DIST_L2, 5);
+    // sure_fg.convertTo(sure_fg, CvType.CV_8UC1);
+    // Imgproc.threshold(sure_fg, sure_fg, 10, 255,
+    // Imgproc.THRESH_TRIANGLE);
+    //
+    // Mat markers = new Mat(src.size(), CvType.CV_8U, new Scalar(0));
+    // Core.add(sure_fg, sure_bg, markers);
+    //
+    // markers.convertTo(markers, CvType.CV_32SC1);
+    //
+    // Imgproc.watershed(src, markers);
+    // Core.convertScaleAbs(markers, markers);
+    // LOGGER.debug("9. convertScaleAbs " +
+    // CvType.typeToString(markers.type()));
+    //
+    // Set<Double> set = new HashSet<>();
+    // for (int row = 0; row < markers.rows(); row++) {
+    // for (int col = 0; col < markers.cols(); col++) {
+    // short aaa[] = new short[5];
+    // double[] a = markers.get(row, col);
+    // set.add(a[0]);
+    // }
+    // }
+    // LOGGER.debug(set);
+    // return markers;
 
 }

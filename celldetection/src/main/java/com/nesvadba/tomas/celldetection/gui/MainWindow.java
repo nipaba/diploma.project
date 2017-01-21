@@ -302,7 +302,7 @@ public class MainWindow extends javax.swing.JFrame {
     }// GEN-LAST:event_btnErodeActionPerformed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCloseActionPerformed
-	canvas.setIcon(mwOps.getCloseImage(files.get(0)));
+	canvas.setIcon(mwOps.getInitImage(files.get(0)));
     }// GEN-LAST:event_btnCloseActionPerformed
 
     private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOpenActionPerformed

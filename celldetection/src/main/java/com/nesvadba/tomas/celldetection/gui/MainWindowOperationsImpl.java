@@ -11,12 +11,12 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 import org.apache.log4j.Logger;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import com.nesvadba.tomas.celldetection.converter.ImageConverter;
 import com.nesvadba.tomas.celldetection.domain.ImageFile;
+import com.nesvadba.tomas.celldetection.domain.ImageStats;
 import com.nesvadba.tomas.celldetection.enums.ImageType;
 import com.nesvadba.tomas.celldetection.util.FolderLoader;
 import com.nesvadba.tomas.celldetection.util.ImageOps;
@@ -48,7 +48,11 @@ public class MainWindowOperationsImpl {
 	// ImageConverter.file2ImageFile(FolderLoader.loadImageFiles(chooser.getSelectedFile(),
 	// false));
 	return ImageConverter.file2ImageFile(
-		FolderLoader.loadImageFiles(new File("C:\\Users\\nipaba\\Documents\\Diplomka\\img\\NAK"), false));
+
+		// FolderLoader.loadImageFiles(new
+		// File("C:\\Users\\nipaba\\Documents\\Diplomka\\img\\NAK"),
+		// false));
+		FolderLoader.loadImageFiles(new File("D:\\GIT\\DIPLOMA\\celldetection\\img\\Fluo2"), false));
 
     }
 
@@ -62,7 +66,7 @@ public class MainWindowOperationsImpl {
 	    imageFile.getData().put(ImageType.INITIAL, image);
 	    imageIcon = new ImageIcon(ImageConverter.Mat2BufferedImage(image));
 	} else {
-	    imageIcon = new ImageIcon(ImageConverter.Mat2BufferedImage(imageFile.getData().get(0)));
+	    imageIcon = new ImageIcon(ImageConverter.Mat2BufferedImage(imageFile.getData().get(ImageType.INITIAL)));
 	}
 	LOGGER.debug("Data for image loaded [" + imageFile.getFile().getAbsolutePath() + "]");
 
@@ -116,21 +120,8 @@ public class MainWindowOperationsImpl {
 
 	Mat init = file.getData().get(ImageType.INITIAL);
 
-	Mat gray = ImageOps.getGrayScale(init);
-	Mat denoise = ImageOps.denoise(gray);
-	Mat bin = ImageOps.getTriangleTreshold(denoise);
-	Mat close = ImageOps.closing(bin);
-	Mat close2 = ImageOps.closing(close);
-	Mat close3 = ImageOps.closing(close2);
-	Mat invert = ImageOps.invert(close3);
-	Mat dst = ImageOps.distanceTransform(invert);
-	dst.convertTo(dst, CvType.CV_8U);
-	Mat erode = ImageOps.erosion(dst);
-
-	Mat bin2 = ImageOps.getTreshold(erode);
-	Mat wathershed = ImageOps.whaterShaded(bin2);
-
-	return new ImageIcon(ImageConverter.Mat2BufferedImage(bin2));
+	ImageStats stats = ImageOps.getFlou2Stats(init);
+	return new ImageIcon(ImageConverter.Mat2BufferedImage(stats.getLabels()));
 
     }
 
