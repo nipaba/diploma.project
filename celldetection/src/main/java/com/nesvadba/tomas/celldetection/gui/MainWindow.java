@@ -5,14 +5,16 @@
  */
 package com.nesvadba.tomas.celldetection.gui;
 
-import java.awt.Image;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
+import com.nesvadba.tomas.celldetection.converter.ImgConverter;
 import com.nesvadba.tomas.celldetection.domain.ImageFile;
+import com.nesvadba.tomas.celldetection.enums.ImageType;
 
 /**
  *
@@ -34,13 +36,14 @@ public class MainWindow extends javax.swing.JFrame {
     public MainWindow() {
 	initComponents();
 
+	setExtendedState(JFrame.MAXIMIZED_BOTH);
+	setVisible(true);
+
 	mwOps = new MainWindowOperationsImpl();
 	files = mwOps.loadFolder(this);
 
-	canvasH = canvasPanel.getSize().height;
-	canvasW = canvasPanel.getSize().width;
-
 	canvas.setIcon(mwOps.getInitImage(files.get(0)));
+
     }
 
     /**
@@ -55,286 +58,144 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-	controlPanel = new javax.swing.JPanel();
-	btnNak = new javax.swing.JButton();
-	btnGrayScale = new javax.swing.JButton();
-	btnErode = new javax.swing.JButton();
-	btnThreshold = new javax.swing.JButton();
-	btnDilate = new javax.swing.JButton();
-	btnClose = new javax.swing.JButton();
-	btnOpen = new javax.swing.JButton();
-	jButton5 = new javax.swing.JButton();
-	canvasPanel = new javax.swing.JPanel();
-	canvas = new javax.swing.JLabel();
-	jMenuBar1 = new javax.swing.JMenuBar();
-	jMenu1 = new javax.swing.JMenu();
-	miOpenFile = new javax.swing.JMenuItem();
-	miOpenFolder = new javax.swing.JMenuItem();
-	miSaveFolder = new javax.swing.JMenuItem();
-	miSaveFile = new javax.swing.JMenuItem();
-	jSeparator1 = new javax.swing.JPopupMenu.Separator();
-	miExit = new javax.swing.JMenuItem();
-	jMenu2 = new javax.swing.JMenu();
-	miPreferences = new javax.swing.JMenuItem();
-	jMenu3 = new javax.swing.JMenu();
-	miAbout = new javax.swing.JMenuItem();
-	miHelp = new javax.swing.JMenuItem();
-	jMenu4 = new javax.swing.JMenu();
-	miExportToExcel = new javax.swing.JMenuItem();
-	miExportToCSV = new javax.swing.JMenuItem();
+        canvas = new javax.swing.JLabel();
+        controlPanel = new javax.swing.JPanel();
+        Basic = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        filePanel = new FilePanel();
+        statsPanel = new StatsPanel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        miOpenFile = new javax.swing.JMenuItem();
+        miOpenFolder = new javax.swing.JMenuItem();
+        miSaveFolder = new javax.swing.JMenuItem();
+        miSaveFile = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        miExit = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        miPreferences = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        miAbout = new javax.swing.JMenuItem();
+        miHelp = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        miExportToExcel = new javax.swing.JMenuItem();
+        miExportToCSV = new javax.swing.JMenuItem();
 
-	setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-	setPreferredSize(new java.awt.Dimension(1500, 800));
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(0, 0, 0));
+        setPreferredSize(new java.awt.Dimension(1500, 800));
 
-	controlPanel.setBackground(new java.awt.Color(102, 102, 255));
-	controlPanel.setMaximumSize(new java.awt.Dimension(300, 99999));
-	controlPanel.setMinimumSize(new java.awt.Dimension(100, 100));
-	controlPanel.setPreferredSize(new java.awt.Dimension(200, 512));
+        canvas.setBackground(new java.awt.Color(0, 0, 0));
+        canvas.setOpaque(true);
+        getContentPane().add(canvas, java.awt.BorderLayout.CENTER);
 
-	btnNak.setText("NAk");
-	btnNak.setMargin(new java.awt.Insets(0, 0, 0, 0));
-	btnNak.setMaximumSize(new java.awt.Dimension(99999, 99999));
-	btnNak.setMinimumSize(new java.awt.Dimension(40, 40));
-	btnNak.setPreferredSize(new java.awt.Dimension(80, 80));
-	btnNak.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnNakActionPerformed(evt);
-	    }
-	});
-	controlPanel.add(btnNak);
+        controlPanel.setBackground(new java.awt.Color(255, 102, 102));
 
-	btnGrayScale.setText("GrayScale");
-	btnGrayScale.setMaximumSize(new java.awt.Dimension(99999, 99999));
-	btnGrayScale.setMinimumSize(new java.awt.Dimension(40, 40));
-	btnGrayScale.setPreferredSize(new java.awt.Dimension(80, 80));
-	btnGrayScale.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnGrayScaleActionPerformed(evt);
-	    }
-	});
-	controlPanel.add(btnGrayScale);
+        Basic.setText("Basic");
+        Basic.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BasicActionPerformed(evt);
+            }
+        });
+        controlPanel.add(Basic);
 
-	btnErode.setText("erode");
-	btnErode.setMaximumSize(new java.awt.Dimension(99999, 99999));
-	btnErode.setMinimumSize(new java.awt.Dimension(40, 40));
-	btnErode.setPreferredSize(new java.awt.Dimension(80, 80));
-	btnErode.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnErodeActionPerformed(evt);
-	    }
-	});
-	controlPanel.add(btnErode);
+        jButton1.setText("jButton1");
+        controlPanel.add(jButton1);
 
-	btnThreshold.setText("Treshold");
-	btnThreshold.setToolTipText("");
-	btnThreshold.setMaximumSize(new java.awt.Dimension(99999, 99999));
-	btnThreshold.setMinimumSize(new java.awt.Dimension(60, 60));
-	btnThreshold.setPreferredSize(new java.awt.Dimension(80, 80));
-	btnThreshold.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnThresholdActionPerformed(evt);
-	    }
-	});
-	controlPanel.add(btnThreshold);
+        jButton2.setText("jButton2");
+        controlPanel.add(jButton2);
 
-	btnDilate.setText("dilate");
-	btnDilate.setMaximumSize(new java.awt.Dimension(99999, 99999));
-	btnDilate.setMinimumSize(new java.awt.Dimension(40, 40));
-	btnDilate.setPreferredSize(new java.awt.Dimension(80, 80));
-	btnDilate.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnDilateActionPerformed(evt);
-	    }
-	});
-	controlPanel.add(btnDilate);
+        getContentPane().add(controlPanel, java.awt.BorderLayout.PAGE_END);
 
-	btnClose.setText("close");
-	btnClose.setMaximumSize(new java.awt.Dimension(99999, 99999));
-	btnClose.setMinimumSize(new java.awt.Dimension(40, 40));
-	btnClose.setPreferredSize(new java.awt.Dimension(80, 80));
-	btnClose.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnCloseActionPerformed(evt);
-	    }
-	});
-	controlPanel.add(btnClose);
+        filePanel.setBackground(new java.awt.Color(0, 255, 102));
+        getContentPane().add(filePanel, java.awt.BorderLayout.LINE_START);
 
-	btnOpen.setText("open");
-	btnOpen.setMaximumSize(new java.awt.Dimension(99999, 99999));
-	btnOpen.setMinimumSize(new java.awt.Dimension(40, 40));
-	btnOpen.setPreferredSize(new java.awt.Dimension(80, 80));
-	btnOpen.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnOpenActionPerformed(evt);
-	    }
-	});
-	controlPanel.add(btnOpen);
+        statsPanel.setBackground(new java.awt.Color(255, 153, 153));
+        getContentPane().add(statsPanel, java.awt.BorderLayout.LINE_END);
 
-	jButton5.setText("denoise");
-	jButton5.setMaximumSize(new java.awt.Dimension(99999, 99999));
-	jButton5.setMinimumSize(new java.awt.Dimension(40, 40));
-	jButton5.setPreferredSize(new java.awt.Dimension(80, 80));
-	jButton5.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		jButton5ActionPerformed(evt);
-	    }
-	});
-	controlPanel.add(jButton5);
+        jMenu1.setText("File");
 
-	getContentPane().add(controlPanel, java.awt.BorderLayout.LINE_END);
+        miOpenFile.setText("open File");
+        miOpenFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miOpenFileActionPerformed(evt);
+            }
+        });
+        jMenu1.add(miOpenFile);
 
-	canvasPanel.setLayout(new java.awt.BorderLayout());
+        miOpenFolder.setText("open Folder");
+        miOpenFolder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miOpenFolderActionPerformed(evt);
+            }
+        });
+        jMenu1.add(miOpenFolder);
 
-	canvas.setText("img");
-	canvas.setMaximumSize(new java.awt.Dimension(32767, 32767));
-	canvas.setMinimumSize(new java.awt.Dimension(512, 512));
-	canvas.setPreferredSize(new java.awt.Dimension(1024, 1024));
-	canvas.setRequestFocusEnabled(false);
-	canvas.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
-	    @Override
-	    public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
-		canvasMouseWheelMoved(evt);
-	    }
-	});
-	canvasPanel.add(canvas, java.awt.BorderLayout.CENTER);
+        miSaveFolder.setText("save Folder");
+        jMenu1.add(miSaveFolder);
 
-	getContentPane().add(canvasPanel, java.awt.BorderLayout.LINE_START);
+        miSaveFile.setText("save File");
+        jMenu1.add(miSaveFile);
+        jMenu1.add(jSeparator1);
 
-	jMenu1.setText("File");
+        miExit.setText("exit");
+        jMenu1.add(miExit);
 
-	miOpenFile.setText("open File");
-	miOpenFile.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		miOpenFileActionPerformed(evt);
-	    }
-	});
-	jMenu1.add(miOpenFile);
+        jMenuBar1.add(jMenu1);
 
-	miOpenFolder.setText("open Folder");
-	miOpenFolder.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		miOpenFolderActionPerformed(evt);
-	    }
-	});
-	jMenu1.add(miOpenFolder);
+        jMenu2.setText("Edit");
 
-	miSaveFolder.setText("save Folder");
-	jMenu1.add(miSaveFolder);
+        miPreferences.setText("preferences");
+        jMenu2.add(miPreferences);
 
-	miSaveFile.setText("save File");
-	jMenu1.add(miSaveFile);
-	jMenu1.add(jSeparator1);
+        jMenuBar1.add(jMenu2);
 
-	miExit.setText("exit");
-	jMenu1.add(miExit);
+        jMenu3.setText("About");
 
-	jMenuBar1.add(jMenu1);
+        miAbout.setText("about");
+        jMenu3.add(miAbout);
 
-	jMenu2.setText("Edit");
+        miHelp.setText("help");
+        jMenu3.add(miHelp);
 
-	miPreferences.setText("preferences");
-	jMenu2.add(miPreferences);
+        jMenuBar1.add(jMenu3);
 
-	jMenuBar1.add(jMenu2);
+        jMenu4.setText("Export");
 
-	jMenu3.setText("About");
+        miExportToExcel.setText("export to Excel");
+        jMenu4.add(miExportToExcel);
 
-	miAbout.setText("about");
-	jMenu3.add(miAbout);
+        miExportToCSV.setText("export to Csv");
+        miExportToCSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportToCSVActionPerformed(evt);
+            }
+        });
+        jMenu4.add(miExportToCSV);
 
-	miHelp.setText("help");
-	jMenu3.add(miHelp);
+        jMenuBar1.add(jMenu4);
 
-	jMenuBar1.add(jMenu3);
+        setJMenuBar(jMenuBar1);
 
-	jMenu4.setText("Export");
-
-	miExportToExcel.setText("export to Excel");
-	jMenu4.add(miExportToExcel);
-
-	miExportToCSV.setText("export to Csv");
-	miExportToCSV.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		miExportToCSVActionPerformed(evt);
-	    }
-	});
-	jMenu4.add(miExportToCSV);
-
-	jMenuBar1.add(jMenu4);
-
-	setJMenuBar(jMenuBar1);
-
-	pack();
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnNakActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnNakActionPerformed
-	canvas.setIcon(mwOps.getNakSegmentation(files.get(0)));
-    }// GEN-LAST:event_btnNakActionPerformed
-
-    private void btnGrayScaleActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGrayScaleActionPerformed
-	canvas.setIcon(mwOps.getGrayScaleImage(files.get(0)));
-    }// GEN-LAST:event_btnGrayScaleActionPerformed
-
-    private void btnThresholdActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnThresholdActionPerformed
-	canvas.setIcon(mwOps.getBinaryImage(files.get(0)));
-    }// GEN-LAST:event_btnThresholdActionPerformed
+    private void BasicActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_BasicActionPerformed
+	ImageFile file = files.get(0);
+	mwOps.proccessBasic(file);
+	canvas.setIcon(new ImageIcon(ImgConverter.Mat2BufferedImage(file.getData().get(ImageType.SEGMENTED))));
+    }// GEN-LAST:event_BasicActionPerformed
 
     private void miExportToCSVActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportToCSVActionPerformed
 	// TODO add your handling code here:
     }// GEN-LAST:event_miExportToCSVActionPerformed
-
-    private void btnErodeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnErodeActionPerformed
-	canvas.setIcon(mwOps.getErodeImage(files.get(0)));
-    }// GEN-LAST:event_btnErodeActionPerformed
-
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCloseActionPerformed
-	canvas.setIcon(mwOps.getInitImage(files.get(0)));
-    }// GEN-LAST:event_btnCloseActionPerformed
-
-    private void btnOpenActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOpenActionPerformed
-	canvas.setIcon(mwOps.getOpenImage(files.get(0)));
-    }// GEN-LAST:event_btnOpenActionPerformed
-
-    private void btnDilateActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDilateActionPerformed
-	canvas.setIcon(mwOps.getDilateImage(files.get(0)));
-    }// GEN-LAST:event_btnDilateActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton5ActionPerformed
-	canvas.setIcon(mwOps.getDenoisedImage(files.get(0)));
-    }// GEN-LAST:event_jButton5ActionPerformed
-
-    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnExportActionPerformed
-
-    }// GEN-LAST:event_btnExportActionPerformed
-
-    private void canvasMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {// GEN-FIRST:event_canvasMouseWheelMoved
-	int scroll = evt.getScrollAmount();
-	int rotation = evt.getWheelRotation();
-
-	canvasH = canvasH + rotation * scroll;
-	canvasW = canvasW + rotation * scroll;
-
-	ImageIcon imageIcon = (ImageIcon) canvas.getIcon();
-	Image image = imageIcon.getImage();
-	Image newimg = image.getScaledInstance(canvasH, canvasW, java.awt.Image.SCALE_SMOOTH);
-	imageIcon = new ImageIcon(newimg);
-	canvas.setIcon(imageIcon);
-
-    }// GEN-LAST:event_canvasMouseWheelMoved
 
     private void miOpenFileActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miOpenFileActionPerformed
 
@@ -342,12 +203,8 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void miOpenFolderActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miOpenFolderActionPerformed
 	files = mwOps.loadFolder(this);
-	canvas.setIcon(mwOps.getInitImage(files.get(0)));
 
     }// GEN-LAST:event_miOpenFolderActionPerformed
-
-    private void listFileValueChanged(javax.swing.event.ListSelectionEvent evt) {// GEN-FIRST:event_listFileValueChanged
-    }// GEN-LAST:event_listFileValueChanged
 
     /**
      * @param args
@@ -395,17 +252,12 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnDilate;
-    private javax.swing.JButton btnErode;
-    private javax.swing.JButton btnGrayScale;
-    private javax.swing.JButton btnNak;
-    private javax.swing.JButton btnOpen;
-    private javax.swing.JButton btnThreshold;
+    private javax.swing.JButton Basic;
     private javax.swing.JLabel canvas;
-    private javax.swing.JPanel canvasPanel;
     private javax.swing.JPanel controlPanel;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JPanel filePanel;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -422,55 +274,8 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenuItem miPreferences;
     private javax.swing.JMenuItem miSaveFile;
     private javax.swing.JMenuItem miSaveFolder;
+    private javax.swing.JPanel statsPanel;
     // End of variables declaration//GEN-END:variables
-
-    public javax.swing.JButton getBtnExport() {
-	return btnNak;
-    }
-
-    public void setBtnExport(javax.swing.JButton btnExport) {
-	this.btnNak = btnExport;
-    }
-
-    public javax.swing.JLabel getCanvas() {
-	return canvas;
-    }
-
-    public void setCanvas(javax.swing.JLabel canvas) {
-	this.canvas = canvas;
-    }
-
-    public javax.swing.JPanel getCanvasPanel() {
-	return canvasPanel;
-    }
-
-    public void setCanvasPanel(javax.swing.JPanel canvasPanel) {
-	this.canvasPanel = canvasPanel;
-    }
-
-    public javax.swing.JPanel getControlPanel() {
-	return controlPanel;
-    }
-
-    public void setControlPanel(javax.swing.JPanel controlPanel) {
-	this.controlPanel = controlPanel;
-    }
-
-    public javax.swing.JButton getjButton2() {
-	return btnThreshold;
-    }
-
-    public void setjButton2(javax.swing.JButton jButton2) {
-	this.btnThreshold = jButton2;
-    }
-
-    public javax.swing.JButton getjButton3() {
-	return btnGrayScale;
-    }
-
-    public void setjButton3(javax.swing.JButton jButton3) {
-	this.btnGrayScale = jButton3;
-    }
 
     public javax.swing.JMenu getjMenu1() {
 	return jMenu1;

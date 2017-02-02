@@ -1,5 +1,7 @@
 package com.nesvadba.tomas.celldetection.app;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.opencv.core.Core;
 
@@ -18,11 +20,22 @@ public class App {
 
     private static void loadOpenCvLibrary(Architecture arch) {
 
-	// TODO - ZPRACOVAT RUZNE podle arhc
-	// System.load("C:\\Program Files\\opencv\\build\\java\\x64\\" +
-	// Core.NATIVE_LIBRARY_NAME + ".dll");
+	File opencvLib;
+	if (arch.getOsName().contains("Windows")) {
+	    LOGGER.debug("Detected windows architecture");
+	    if ("64".equals(arch.getOsDataModel())) {
+		LOGGER.debug("Detected 64bit architecture");
+		opencvLib = new File("lib\\opencv\\x64"); // TODO -
+							  // CONFIGURATION
 
-	System.load("D:\\GIT\\DIPLOMA\\celldetection\\opencv\\x64\\" + Core.NATIVE_LIBRARY_NAME + ".dll");
+	    } else {
+		LOGGER.debug("Detected 32bit architecture");
+		opencvLib = new File("lib\\opencv\\x86");// TODO - CONFIGURATION
+	    }
+
+	    System.load(opencvLib.getAbsolutePath() + "\\" + Core.NATIVE_LIBRARY_NAME + ".dll");
+	}
+
     }
 
     public static void main(String[] args) {

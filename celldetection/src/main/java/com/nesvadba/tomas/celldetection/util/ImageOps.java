@@ -16,7 +16,7 @@ public class ImageOps {
 
     private static final Logger LOGGER = Logger.getLogger(ImageOps.class);
 
-    private static Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(new Point(13.0, 13.0)));
+    private static Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(new Point(13.0, 13.0)));
 
     public static Mat denoise(Mat src) {
 	Mat dst = new Mat();
@@ -60,7 +60,7 @@ public class ImageOps {
 
     public static Mat erosion(Mat src) {
 	Mat dst = new Mat();
-	Imgproc.erode(src, dst, kernel2);
+	Imgproc.erode(src, dst, kernel);
 	return dst;
     }
 
@@ -85,7 +85,8 @@ public class ImageOps {
 	return dst;
     }
 
-    public static ImageStats getFlou1Stats(Mat src) {
+    public static ImageStats getBasicSegmentation(Mat src) {
+	Long startTime = System.currentTimeMillis();
 
 	Mat gray = new Mat(src.size(), CvType.CV_8UC3);
 
@@ -97,35 +98,23 @@ public class ImageOps {
 	Mat bin = new Mat();
 	Imgproc.threshold(denoise, bin, 0, 255, Imgproc.THRESH_TRIANGLE + Imgproc.THRESH_BINARY);
 
-	return getStats(bin);
-    }
-
-    public static ImageStats getFlou2Stats(Mat src) {
-
-	Mat gray = new Mat(src.size(), CvType.CV_8UC3);
-
-	Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY);
-
-	Mat denoise = new Mat();
-	Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)), 5);
-
-	Mat bin = new Mat();
-	Imgproc.threshold(denoise, bin, 0, 255, Imgproc.THRESH_TRIANGLE + Imgproc.THRESH_BINARY);
+	Mat dst = distanceTransform(invert(bin));
+	dst.convertTo(dst, CvType.CV_8UC1);
 
 	Mat topHap = new Mat();
 	Imgproc.morphologyEx(bin, topHap, Imgproc.MORPH_ERODE, Mat.ones(new Size(3, 3), CvType.CV_8U));
 
 	Core.absdiff(bin, topHap, topHap);
 
-	// for (int i = 0 )
-	// Core.add(, src2, dst);
+	Mat segmentedOrig = new Mat();
+	Core.add(topHap, gray, segmentedOrig, new Mat(), CvType.CV_8UC3);
+	double maxSum = Core.norm(segmentedOrig, Core.NORM_INF);
 
-	Core.add(topHap, gray, gray, new Mat(), CvType.CV_8UC3);
-	double maxSum = Core.norm(gray, Core.NORM_INF);
+	ImageStats stats = getStats(bin);
+	stats.setSegmentedImg(dst);
 
-	ImageStats stats = new ImageStats();
-	stats.setLabels(gray);
-	return stats;// getStats(bin);
+	LOGGER.debug("getFlou2Stats time :" + (System.currentTimeMillis() - startTime));
+	return stats;//
     }
 
     /**

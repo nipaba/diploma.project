@@ -9,6 +9,15 @@ public class ImageStats {
 
     private List<Yeast> yeasts = new ArrayList<>();
     private Mat labels;
+    private Mat segmentedImg;
+
+    public Mat getSegmentedImg() {
+	return segmentedImg;
+    }
+
+    public void setSegmentedImg(Mat segmentedImg) {
+	this.segmentedImg = segmentedImg;
+    }
 
     public List<Yeast> getYeasts() {
 	return yeasts;
