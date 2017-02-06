@@ -5,12 +5,21 @@
  */
 package com.nesvadba.tomas.celldetection.gui;
 
+import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
+import org.opencv.core.Core;
+import org.opencv.core.Core.MinMaxLocResult;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import com.nesvadba.tomas.celldetection.converter.ImgConverter;
 import com.nesvadba.tomas.celldetection.domain.ImageFile;
@@ -25,13 +34,11 @@ public class MainWindow extends javax.swing.JFrame {
     private MainWindowOperationsImpl mwOps;
     private List<ImageFile> files;
 
-    private int canvasH;
-    private int canvasW;
-
+    private Mat initMat;
     private static final Logger LOGGER = Logger.getLogger(MainWindow.class);
 
     /**
-     * Creates new form MainWindow
+     * // * Creates new form MainWindow
      */
     public MainWindow() {
 	initComponents();
@@ -41,9 +48,27 @@ public class MainWindow extends javax.swing.JFrame {
 
 	mwOps = new MainWindowOperationsImpl();
 	files = mwOps.loadFolder(this);
+	mwOps.getInitImage(files.get(0));
+	ImageFile file = files.get(0);
+	// mwOps.proccessBasic(file);
+	// canvas.setIcon(new
+	// ImageIcon(ImgConverter.Mat2BufferedImage(file.getData().get(ImageType.SEGMENTED))));
+	Mat init = file.getData().get(ImageType.INITIAL);
+	Mat gray = new Mat(init.size(), CvType.CV_8UC3);
+	Imgproc.cvtColor(init, gray, Imgproc.COLOR_RGB2GRAY);
 
-	canvas.setIcon(mwOps.getInitImage(files.get(0)));
+	Mat denoise = new Mat();
+	Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)), 5);
 
+	Mat dst = new Mat();
+	Mat ones = Mat.ones(init.size(), CvType.CV_8U);
+	ones.setTo(new Scalar(255.0), ones);
+	Core.absdiff(ones, denoise, dst);
+	dst.convertTo(dst, CvType.CV_8U);
+
+	// canvas.setIcon(new ImageIcon(ImgConverter.Mat2BufferedImage(dst)));
+
+	initMat = dst;
     }
 
     /**
@@ -61,136 +86,174 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        canvas = new javax.swing.JLabel();
-        controlPanel = new javax.swing.JPanel();
-        Basic = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        filePanel = new FilePanel();
-        statsPanel = new StatsPanel();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        miOpenFile = new javax.swing.JMenuItem();
-        miOpenFolder = new javax.swing.JMenuItem();
-        miSaveFolder = new javax.swing.JMenuItem();
-        miSaveFile = new javax.swing.JMenuItem();
-        jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        miExit = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        miPreferences = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
-        miAbout = new javax.swing.JMenuItem();
-        miHelp = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
-        miExportToExcel = new javax.swing.JMenuItem();
-        miExportToCSV = new javax.swing.JMenuItem();
+	canvas = new javax.swing.JLabel();
+	controlPanel = new javax.swing.JPanel();
+	Basic = new javax.swing.JButton();
+	jButton1 = new javax.swing.JButton();
+	jButton2 = new javax.swing.JButton();
+	filePanel = new FilePanel();
+	statsPanel = new StatsPanel();
+	jMenuBar1 = new javax.swing.JMenuBar();
+	jMenu1 = new javax.swing.JMenu();
+	miOpenFile = new javax.swing.JMenuItem();
+	miOpenFolder = new javax.swing.JMenuItem();
+	miSaveFolder = new javax.swing.JMenuItem();
+	miSaveFile = new javax.swing.JMenuItem();
+	jSeparator1 = new javax.swing.JPopupMenu.Separator();
+	miExit = new javax.swing.JMenuItem();
+	jMenu2 = new javax.swing.JMenu();
+	miPreferences = new javax.swing.JMenuItem();
+	jMenu3 = new javax.swing.JMenu();
+	miAbout = new javax.swing.JMenuItem();
+	miHelp = new javax.swing.JMenuItem();
+	jMenu4 = new javax.swing.JMenu();
+	miExportToExcel = new javax.swing.JMenuItem();
+	miExportToCSV = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setBackground(new java.awt.Color(0, 0, 0));
-        setPreferredSize(new java.awt.Dimension(1500, 800));
+	setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+	setBackground(new java.awt.Color(0, 0, 0));
+	setPreferredSize(new java.awt.Dimension(1500, 800));
 
-        canvas.setBackground(new java.awt.Color(0, 0, 0));
-        canvas.setOpaque(true);
-        getContentPane().add(canvas, java.awt.BorderLayout.CENTER);
+	canvas.setBackground(new java.awt.Color(0, 0, 0));
+	canvas.setOpaque(true);
+	getContentPane().add(canvas, java.awt.BorderLayout.CENTER);
 
-        controlPanel.setBackground(new java.awt.Color(255, 102, 102));
+	controlPanel.setBackground(new java.awt.Color(255, 102, 102));
 
-        Basic.setText("Basic");
-        Basic.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BasicActionPerformed(evt);
-            }
-        });
-        controlPanel.add(Basic);
+	Basic.setText("Basic");
+	Basic.addActionListener(new java.awt.event.ActionListener() {
+	    @Override
+	    public void actionPerformed(java.awt.event.ActionEvent evt) {
+		BasicActionPerformed(evt);
+	    }
+	});
+	controlPanel.add(Basic);
 
-        jButton1.setText("jButton1");
-        controlPanel.add(jButton1);
+	jButton1.setText("jButton1");
+	controlPanel.add(jButton1);
 
-        jButton2.setText("jButton2");
-        controlPanel.add(jButton2);
+	jButton2.setText("jButton2");
+	controlPanel.add(jButton2);
 
-        getContentPane().add(controlPanel, java.awt.BorderLayout.PAGE_END);
+	getContentPane().add(controlPanel, java.awt.BorderLayout.PAGE_END);
 
-        filePanel.setBackground(new java.awt.Color(0, 255, 102));
-        getContentPane().add(filePanel, java.awt.BorderLayout.LINE_START);
+	filePanel.setBackground(new java.awt.Color(0, 255, 102));
+	getContentPane().add(filePanel, java.awt.BorderLayout.LINE_START);
 
-        statsPanel.setBackground(new java.awt.Color(255, 153, 153));
-        getContentPane().add(statsPanel, java.awt.BorderLayout.LINE_END);
+	statsPanel.setBackground(new java.awt.Color(255, 153, 153));
+	getContentPane().add(statsPanel, java.awt.BorderLayout.LINE_END);
 
-        jMenu1.setText("File");
+	jMenu1.setText("File");
 
-        miOpenFile.setText("open File");
-        miOpenFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miOpenFileActionPerformed(evt);
-            }
-        });
-        jMenu1.add(miOpenFile);
+	miOpenFile.setText("open File");
+	miOpenFile.addActionListener(new java.awt.event.ActionListener() {
+	    @Override
+	    public void actionPerformed(java.awt.event.ActionEvent evt) {
+		miOpenFileActionPerformed(evt);
+	    }
+	});
+	jMenu1.add(miOpenFile);
 
-        miOpenFolder.setText("open Folder");
-        miOpenFolder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miOpenFolderActionPerformed(evt);
-            }
-        });
-        jMenu1.add(miOpenFolder);
+	miOpenFolder.setText("open Folder");
+	miOpenFolder.addActionListener(new java.awt.event.ActionListener() {
+	    @Override
+	    public void actionPerformed(java.awt.event.ActionEvent evt) {
+		miOpenFolderActionPerformed(evt);
+	    }
+	});
+	jMenu1.add(miOpenFolder);
 
-        miSaveFolder.setText("save Folder");
-        jMenu1.add(miSaveFolder);
+	miSaveFolder.setText("save Folder");
+	jMenu1.add(miSaveFolder);
 
-        miSaveFile.setText("save File");
-        jMenu1.add(miSaveFile);
-        jMenu1.add(jSeparator1);
+	miSaveFile.setText("save File");
+	jMenu1.add(miSaveFile);
+	jMenu1.add(jSeparator1);
 
-        miExit.setText("exit");
-        jMenu1.add(miExit);
+	miExit.setText("exit");
+	jMenu1.add(miExit);
 
-        jMenuBar1.add(jMenu1);
+	jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Edit");
+	jMenu2.setText("Edit");
 
-        miPreferences.setText("preferences");
-        jMenu2.add(miPreferences);
+	miPreferences.setText("preferences");
+	jMenu2.add(miPreferences);
 
-        jMenuBar1.add(jMenu2);
+	jMenuBar1.add(jMenu2);
 
-        jMenu3.setText("About");
+	jMenu3.setText("About");
 
-        miAbout.setText("about");
-        jMenu3.add(miAbout);
+	miAbout.setText("about");
+	jMenu3.add(miAbout);
 
-        miHelp.setText("help");
-        jMenu3.add(miHelp);
+	miHelp.setText("help");
+	jMenu3.add(miHelp);
 
-        jMenuBar1.add(jMenu3);
+	jMenuBar1.add(jMenu3);
 
-        jMenu4.setText("Export");
+	jMenu4.setText("Export");
 
-        miExportToExcel.setText("export to Excel");
-        jMenu4.add(miExportToExcel);
+	miExportToExcel.setText("export to Excel");
+	jMenu4.add(miExportToExcel);
 
-        miExportToCSV.setText("export to Csv");
-        miExportToCSV.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportToCSVActionPerformed(evt);
-            }
-        });
-        jMenu4.add(miExportToCSV);
+	miExportToCSV.setText("export to Csv");
+	miExportToCSV.addActionListener(new java.awt.event.ActionListener() {
+	    @Override
+	    public void actionPerformed(java.awt.event.ActionEvent evt) {
+		miExportToCSVActionPerformed(evt);
+	    }
+	});
+	jMenu4.add(miExportToCSV);
 
-        jMenuBar1.add(jMenu4);
+	jMenuBar1.add(jMenu4);
 
-        setJMenuBar(jMenuBar1);
+	setJMenuBar(jMenuBar1);
 
-        pack();
+	pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private int index = 0;
+
+    private List<Mat> mat = new ArrayList<Mat>();
+
     private void BasicActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_BasicActionPerformed
-	ImageFile file = files.get(0);
-	mwOps.proccessBasic(file);
-	canvas.setIcon(new ImageIcon(ImgConverter.Mat2BufferedImage(file.getData().get(ImageType.SEGMENTED))));
+
+	MinMaxLocResult minMaxLocResult = Core.minMaxLoc(initMat);
+	LOGGER.debug("XXX" + minMaxLocResult.maxVal + "// " + minMaxLocResult.minVal);
+
+	Double min = minMaxLocResult.minVal;
+	Double max = minMaxLocResult.maxVal;
+	index = min.intValue();
+
+	for (int i = min.intValue(); i < max.intValue(); i++) {
+
+	    Mat binary = Mat.zeros(initMat.size(), CvType.CV_8UC1);
+	    LOGGER.debug("XXX" + index);
+	    Imgproc.threshold(initMat, binary, index, 255, Imgproc.THRESH_BINARY);
+	    index++;
+	    Mat labels = new Mat();
+	    Mat stats = new Mat();
+	    Mat centroids = new Mat();
+
+	    Imgproc.connectedComponentsWithStats(binary, labels, stats, centroids);
+	    labels.convertTo(labels, CvType.CV_8UC3);
+
+	    mat.add(labels);
+
+	}
+
+	Graphics g = canvas.getGraphics();
+
+	Mat temp = new Mat();
+	Core.normalize(mat.get(120), temp, 0, 255, Core.NORM_MINMAX);
+
+	g.drawImage(ImgConverter.Mat2BufferedImage(temp), 0, 0, null, null);
+
     }// GEN-LAST:event_BasicActionPerformed
 
     private void miExportToCSVActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportToCSVActionPerformed
@@ -210,46 +273,51 @@ public class MainWindow extends javax.swing.JFrame {
      * @param args
      *            the command line arguments
      */
-    public static void main(String args[]) {
-	/* Set the Nimbus look and feel */
-	// <editor-fold defaultstate="collapsed" desc=" Look and feel setting
-	// code (optional) ">
-	/*
-	 * If Nimbus (introduced in Java SE 6) is not available, stay with the
-	 * default look and feel. For details see
-	 * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.
-	 * html
-	 */
-	try {
-	    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-		if ("Nimbus".equals(info.getName())) {
-		    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-		    break;
-		}
-	    }
-	} catch (ClassNotFoundException ex) {
-	    java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null,
-		    ex);
-	} catch (InstantiationException ex) {
-	    java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null,
-		    ex);
-	} catch (IllegalAccessException ex) {
-	    java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null,
-		    ex);
-	} catch (javax.swing.UnsupportedLookAndFeelException ex) {
-	    java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null,
-		    ex);
-	}
-	// </editor-fold>
-
-	/* Create and display the form */
-	java.awt.EventQueue.invokeLater(new Runnable() {
-	    @Override
-	    public void run() {
-		new MainWindow().setVisible(true);
-	    }
-	});
-    }
+    // public static void main(String args[]) {
+    // /* Set the Nimbus look and feel */
+    // // <editor-fold defaultstate="collapsed" desc=" Look and feel setting
+    // // code (optional) ">
+    // /*
+    // * If Nimbus (introduced in Java SE 6) is not available, stay with the
+    // * default look and feel. For details see
+    // * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.
+    // * html
+    // */
+    // try {
+    // for (javax.swing.UIManager.LookAndFeelInfo info :
+    // javax.swing.UIManager.getInstalledLookAndFeels()) {
+    // if ("Nimbus".equals(info.getName())) {s
+    // javax.swing.UIManager.setLookAndFeel(info.getClassName());
+    // break;
+    // }
+    // }
+    // } catch (ClassNotFoundException ex) {
+    // java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE,
+    // null,
+    // ex);
+    // } catch (InstantiationException ex) {
+    // java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE,
+    // null,
+    // ex);
+    // } catch (IllegalAccessException ex) {
+    // java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE,
+    // null,
+    // ex);
+    // } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+    // java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE,
+    // null,
+    // ex);
+    // }
+    // // </editor-fold>
+    //
+    // /* Create and display the form */
+    // java.awt.EventQueue.invokeLater(new Runnable() {
+    // @Override
+    // public void run() {
+    // new MainWindow().setVisible(true);
+    // }
+    // });
+    // }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Basic;

@@ -52,10 +52,11 @@ public class MainWindowOperationsImpl {
 		// FolderLoader.loadImageFiles(new
 		// File("C:\\Users\\nipaba\\Documents\\Diplomka\\img\\NAK"),
 		// false));
-		// FolderLoader.loadImageFiles(new
-		// File("D:\\GIT\\DIPLOMA\\celldetection\\img\\Fluo2"), false));
-		FolderLoader.loadImageFiles(
-			new File("C:\\Users\\nipaba\\Documents\\GIT\\project\\celldetection\\img\\NAK"), false));
+		FolderLoader.loadImageFiles(new File("D:\\GIT\\DIPLOMA\\celldetection\\img\\NAK"), false));
+	// FolderLoader.loadImageFiles(
+	// new
+	// File("C:\\Users\\nipaba\\Documents\\GIT\\project\\celldetection\\img\\NAK"),
+	// false));
 
     }
 

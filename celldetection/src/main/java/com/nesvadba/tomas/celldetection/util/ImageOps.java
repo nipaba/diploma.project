@@ -1,10 +1,14 @@
 package com.nesvadba.tomas.celldetection.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -210,5 +214,44 @@ public class ImageOps {
     // }
     // LOGGER.debug(set);
     // return markers;
+
+    private void temp(List<Mat> labels, Mat initMat) {
+
+	List<Point3> points = new ArrayList<>();
+	for (int row = 0; row < initMat.rows(); row++) {
+	    for (int col = 0; col < initMat.cols(); col++) {
+
+		double val[] = initMat.get(row, col);
+		if (val[0] > 0) {
+		    points.add(new Point3(row, col, val[0]));
+		}
+
+	    }
+	}
+
+	ConnectedComponentsTree mujGraph; // Level 0,
+	int level = 0;// min
+	while (!points.isEmpty()) {
+
+	    List<Point3> nextRound = new ArrayList<>();
+	    level++; // zpracovavany level
+
+	    // ziskej predchozi level
+	    Mat parentLevel = labels.get(level - 1);
+	    for (Point3 point : points) {
+
+		if (point.z != level) {
+		    // bod tu nekonci posledni jeho kolo
+		    nextRound.add(point);
+		}
+		// Vytvor v parentovi List s timtobodem
+		double[] label = parentLevel.get((int) point.x, (int) point.y);
+
+		mujGraph.insertPointToNode(point, level, label[0]);
+
+	    }
+	}
+
+    }
 
 }
