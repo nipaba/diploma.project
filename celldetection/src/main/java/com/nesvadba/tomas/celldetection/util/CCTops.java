@@ -28,9 +28,9 @@ public class CCTops {
     public ConnectedComponentsTree temp(Mat initMat) {
 
 	// points = new Point[initMat.rows()][initMat.cols()];
-	points = new Point[20][40];
+	points = new Point[20][20];
 	for (int row = 0; row < 20; row++) {
-	    for (int col = 0; col < 40; col++) {
+	    for (int col = 0; col < 20; col++) {
 		// for (int row = 0; row < initMat.rows(); row++) {
 		// for (int col = 0; col < initMat.cols(); col++) {
 		Point p = new Point();
@@ -67,8 +67,9 @@ public class CCTops {
     }
 
     private int flood(int level) {
+	LOGGER.debug("**********************************************************************************");
 	LOGGER.debug("LEVEL " + level);
-	// print();
+	print();
 	Queue<Point> queue = quegeMap.get(level);
 
 	while (!queue.isEmpty()) {
@@ -88,7 +89,7 @@ public class CCTops {
 	    }
 
 	    p.status = PointStatus.A;
-	    print();
+	    // print();
 	    p.status = PointStatus.P;
 
 	    queue.remove(p);
