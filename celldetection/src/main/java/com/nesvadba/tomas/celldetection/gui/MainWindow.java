@@ -5,15 +5,12 @@
  */
 package com.nesvadba.tomas.celldetection.gui;
 
-import java.awt.Graphics;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 import org.opencv.core.Core;
-import org.opencv.core.Core.MinMaxLocResult;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -21,9 +18,9 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import com.nesvadba.tomas.celldetection.converter.ImgConverter;
 import com.nesvadba.tomas.celldetection.domain.ImageFile;
 import com.nesvadba.tomas.celldetection.enums.ImageType;
+import com.nesvadba.tomas.celldetection.util.CCTops;
 
 /**
  *
@@ -217,43 +214,9 @@ public class MainWindow extends javax.swing.JFrame {
 	pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private int index = 0;
-
-    private List<Mat> mat = new ArrayList<Mat>();
-
     private void BasicActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_BasicActionPerformed
-
-	MinMaxLocResult minMaxLocResult = Core.minMaxLoc(initMat);
-	LOGGER.debug("XXX" + minMaxLocResult.maxVal + "// " + minMaxLocResult.minVal);
-
-	Double min = minMaxLocResult.minVal;
-	Double max = minMaxLocResult.maxVal;
-	index = min.intValue();
-
-	for (int i = min.intValue(); i < max.intValue(); i++) {
-
-	    Mat binary = Mat.zeros(initMat.size(), CvType.CV_8UC1);
-	    LOGGER.debug("XXX" + index);
-	    Imgproc.threshold(initMat, binary, index, 255, Imgproc.THRESH_BINARY);
-	    index++;
-	    Mat labels = new Mat();
-	    Mat stats = new Mat();
-	    Mat centroids = new Mat();
-
-	    Imgproc.connectedComponentsWithStats(binary, labels, stats, centroids);
-	    labels.convertTo(labels, CvType.CV_8UC3);
-
-	    mat.add(labels);
-
-	}
-
-	Graphics g = canvas.getGraphics();
-
-	Mat temp = new Mat();
-	Core.normalize(mat.get(120), temp, 0, 255, Core.NORM_MINMAX);
-
-	g.drawImage(ImgConverter.Mat2BufferedImage(temp), 0, 0, null, null);
-
+	CCTops a = new CCTops();
+	a.temp(initMat);
     }// GEN-LAST:event_BasicActionPerformed
 
     private void miExportToCSVActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportToCSVActionPerformed

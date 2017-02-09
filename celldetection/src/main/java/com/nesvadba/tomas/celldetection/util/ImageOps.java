@@ -1,14 +1,10 @@
 package com.nesvadba.tomas.celldetection.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
-import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -158,100 +154,6 @@ public class ImageOps {
 	imageStats.setLabels(labels);
 
 	return imageStats;
-    }
-
-    // Mat gray = new Mat(src.size(), CvType.CV_8UC3);
-    //
-    // Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY);
-    // LOGGER.debug("1. Grayscale " + CvType.typeToString(gray.type()));
-    // //
-    // =========================================================================================
-    // Mat denoise = new Mat();
-    // Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)),
-    // 5);
-    // LOGGER.debug("2. Denoise " + CvType.typeToString(denoise.type()));
-    // //
-    // =========================================================================================
-    // Mat bin = new Mat();
-    // Imgproc.threshold(denoise, bin, 0, 255, Imgproc.THRESH_TRIANGLE);
-    // LOGGER.debug("3. Threshold " + CvType.typeToString(bin.type()));
-    // //
-    // =========================================================================================
-    // Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new
-    // Size(3, 3)); // 19,19
-    // Mat ret = new Mat(src.size(), CvType.CV_8U);
-    // Imgproc.morphologyEx(bin, ret, Imgproc.MORPH_OPEN, kernel);
-    //
-    // // Sure background area
-    // Mat sure_bg = new Mat(src.size(), CvType.CV_8U);
-    // Imgproc.dilate(ret, sure_bg, new Mat(), new Point(-1, -1), 3);
-    // Imgproc.threshold(sure_bg, sure_bg, 1, 128,
-    // Imgproc.THRESH_BINARY_INV);
-    //
-    // Mat sure_fg = new Mat(src.size(), CvType.CV_8U);
-    // Imgproc.distanceTransform(bin, sure_fg, Imgproc.CV_DIST_L2, 5);
-    // sure_fg.convertTo(sure_fg, CvType.CV_8UC1);
-    // Imgproc.threshold(sure_fg, sure_fg, 10, 255,
-    // Imgproc.THRESH_TRIANGLE);
-    //
-    // Mat markers = new Mat(src.size(), CvType.CV_8U, new Scalar(0));
-    // Core.add(sure_fg, sure_bg, markers);
-    //
-    // markers.convertTo(markers, CvType.CV_32SC1);
-    //
-    // Imgproc.watershed(src, markers);
-    // Core.convertScaleAbs(markers, markers);
-    // LOGGER.debug("9. convertScaleAbs " +
-    // CvType.typeToString(markers.type()));
-    //
-    // Set<Double> set = new HashSet<>();
-    // for (int row = 0; row < markers.rows(); row++) {
-    // for (int col = 0; col < markers.cols(); col++) {
-    // short aaa[] = new short[5];
-    // double[] a = markers.get(row, col);
-    // set.add(a[0]);
-    // }
-    // }
-    // LOGGER.debug(set);
-    // return markers;
-
-    private void temp(List<Mat> labels, Mat initMat) {
-
-	List<Point3> points = new ArrayList<>();
-	for (int row = 0; row < initMat.rows(); row++) {
-	    for (int col = 0; col < initMat.cols(); col++) {
-
-		double val[] = initMat.get(row, col);
-		if (val[0] > 0) {
-		    points.add(new Point3(row, col, val[0]));
-		}
-
-	    }
-	}
-
-	ConnectedComponentsTree mujGraph; // Level 0,
-	int level = 0;// min
-	while (!points.isEmpty()) {
-
-	    List<Point3> nextRound = new ArrayList<>();
-	    level++; // zpracovavany level
-
-	    // ziskej predchozi level
-	    Mat parentLevel = labels.get(level - 1);
-	    for (Point3 point : points) {
-
-		if (point.z != level) {
-		    // bod tu nekonci posledni jeho kolo
-		    nextRound.add(point);
-		}
-		// Vytvor v parentovi List s timtobodem
-		double[] label = parentLevel.get((int) point.x, (int) point.y);
-
-		mujGraph.insertPointToNode(point, level, label[0]);
-
-	    }
-	}
-
     }
 
 }

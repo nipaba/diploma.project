@@ -5,64 +5,101 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.opencv.core.Point3;
+import org.apache.log4j.Logger;
 
 public class ConnectedComponentsTree {
 
-    int level;
-    List<Point3> points = new ArrayList<>();
-    int label;
-    Map<Integer, ConnectedComponentsTree> nodes = new HashMap();
+    private static final Logger LOGGER = Logger.getLogger(ConnectedComponentsTree.class);
 
-    public void insertPointToNode(Point3 point, int inLevel, int inLabel) {
-	ConnectedComponentsTree cct = findNode(inLevel, inLabel);
-	if (cct == null) {
-	    cct = createNode(inLevel, inLabel);
+    private int level;
+    private int label;
+
+    private List<Point> points = new ArrayList<>();
+    private Map<Integer, ConnectedComponentsTree> nodes = new HashMap<>();
+
+    public ConnectedComponentsTree(int nodeLevel, Integer nodeLabel) {
+	label = nodeLabel;
+	level = nodeLevel;
+    }
+
+    public ConnectedComponentsTree insertLeafToNode(int leafLevel, Integer leafLabel, int nodeLevel,
+	    Integer nodeLabel) {
+
+	ConnectedComponentsTree parent = findNode(nodeLevel, nodeLabel);
+	if (parent == null) {
+	    parent = new ConnectedComponentsTree(nodeLevel, nodeLabel);
 	}
-	cct.insertPoint(point);
+
+	ConnectedComponentsTree child = findNode(leafLevel, leafLabel);
+	if (child == null) {
+	    child = new ConnectedComponentsTree(leafLevel, leafLabel);
+	}
+	parent.getNodes().put(leafLabel, child);
+
+	return parent;
     }
 
-    private void insertPoint(Point3 point) {
-	points.add(point);
-    }
+    private ConnectedComponentsTree findNode(int nodeLevel, int nodeLabel) {
 
-    public ConnectedComponentsTree() {
-	level = 0;
-    }
-
-    public ConnectedComponentsTree createNode(int inLevel, int inLabel) {
-
-	ConnectedComponentsTree cct = new ConnectedComponentsTree(inLevel, inLabel);
-	nodes.put(inLabel, cct);
-
-	return cct;
-
-    }
-
-    public ConnectedComponentsTree(int inLevel, int inLabel) {
-	level = inLevel;
-	label = inLabel;
-    }
-
-    public ConnectedComponentsTree findNode(int inLevel, int inLabel) {
-	ConnectedComponentsTree cct = null;
-
-	if (level == inLabel && label == inLabel) {
-	    cct = this;
-	} else if (level < inLevel) {
-	    cct = null;
+	if (level == nodeLevel && label == nodeLabel) {
+	    return this;
 	} else {
-
-	    for (ConnectedComponentsTree cctNode : nodes.values()) {
-		cct = cctNode.findNode(inLevel, inLabel);
-
-		if (cct != null) {
-		    break;
-		}
+	    ConnectedComponentsTree cctSearched = null;
+	    for (ConnectedComponentsTree node : nodes.values()) {
+		cctSearched = node.findNode(nodeLevel, nodeLabel);
+		if (cctSearched != null)
+		    return cctSearched;
 	    }
 	}
 
-	return cct;
+	return null;
+    }
+
+    public int getLevel() {
+	return level;
+    }
+
+    public void setLevel(int level) {
+	this.level = level;
+    }
+
+    public int getLabel() {
+	return label;
+    }
+
+    public void setLabel(int label) {
+	this.label = label;
+    }
+
+    public List<Point> getPoints() {
+	return points;
+    }
+
+    public void setPoints(List<Point> points) {
+	this.points = points;
+    }
+
+    public Map<Integer, ConnectedComponentsTree> getNodes() {
+	return nodes;
+    }
+
+    public void setNodes(Map<Integer, ConnectedComponentsTree> nodes) {
+	this.nodes = nodes;
+    }
+
+    public void print(String str) {
+	String thisLevel = "[" + level + "|" + label + "/" + nodes.size() + "]";
+	if (nodes.size() == 0) {
+	    LOGGER.debug(str + thisLevel + points);
+	} else {
+	    for (ConnectedComponentsTree node : nodes.values()) {
+		node.print(str + thisLevel);
+	    }
+	}
+    }
+
+    public String getCode() {
+	return level + "#" + label;
     }
 
 }
