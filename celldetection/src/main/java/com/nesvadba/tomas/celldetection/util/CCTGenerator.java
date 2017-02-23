@@ -10,56 +10,33 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.opencv.core.Mat;
 
-public class CCTops {
+public class CCTGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(CCTops.class);
+    private static final Logger LOGGER = Logger.getLogger(CCTGenerator.class);
 
-    Map<Integer, Queue<Point>> quegeMap = new HashMap<>();
-    // Body ke zkoumani
-    Point[][] points;
+    private Map<Integer, Queue<Point>> quegeMap = new HashMap<>();
+    private Point[][] points;
+    private Map<Integer, Integer> number_nodes = new HashMap<>();
+    private Map<String, ConnectedComponentsTree> createdNodes = new HashMap<>();
 
-    // AKA labels
-    Map<Integer, Integer> number_nodes = new HashMap<>();
-    // Mapa vsech uzlu - postupne vytvarime a spojujeme
-    Map<String, ConnectedComponentsTree> createdNodes = new HashMap<>();
-
-    ConnectedComponentsTree cct = null;
+    private ConnectedComponentsTree cct = null;
 
     public ConnectedComponentsTree temp(Mat initMat) {
 
-	// points = new Point[initMat.rows()][initMat.cols()];
-	points = new Point[20][20];
-	for (int row = 0; row < 20; row++) {
-	    for (int col = 0; col < 20; col++) {
-		// for (int row = 0; row < initMat.rows(); row++) {
-		// for (int col = 0; col < initMat.cols(); col++) {
-		Point p = new Point();
-		p.x = row;
-		p.y = col;
-		p.status = PointStatus.U;
-		p.value = Double.valueOf(initMat.get(row, col)[0]).intValue() - 100;
-		points[row][col] = p;
-	    }
-	}
-
+	initPoints(initMat);
 	initNumberNodes(256);
 
-	print();
+	long startTime = System.currentTimeMillis();
 	proccess(points[0][0], 0);
-	cct.print("");
-	return null;
-    }
+	LOGGER.debug("Proccessing time: " + (System.currentTimeMillis() - startTime));
+	LOGGER.debug("Image Size : " + initMat.rows() * initMat.cols());
 
-    private void initNumberNodes(int layerCount) {
-	for (int i = 0; i < layerCount; i++) {
-	    number_nodes.put(i, 0);
-	}
-
+	return cct;
     }
 
     private void proccess(Point p, int level) {
 
-	int m = p.value; // hodnota bodu p
+	int m = p.value;
 	addToQueue(p);
 	while (m >= level) {
 	    m = flood(m);
@@ -67,20 +44,19 @@ public class CCTops {
     }
 
     private int flood(int level) {
-	LOGGER.debug("**********************************************************************************");
-	LOGGER.debug("LEVEL " + level);
-	print();
+	// LOGGER.debug("**********************************************************************************");
+	// LOGGER.debug("LEVEL " + level);
+	// print();
 	Queue<Point> queue = quegeMap.get(level);
 
 	while (!queue.isEmpty()) {
 	    Point p = queue.peek();
-
+	    getNode(level, "point" + p).getPoints().add(p);
 	    // get All Neigborous
 	    for (Point n : getNeigb(p)) {
-		getNode(level, "point" + p).getPoints().add(p);
 
 		if (n.value > p.value && n.status == PointStatus.U) {
-		    LOGGER.debug("Found upperLevel" + p);
+		    // LOGGER.debug("Found upperLevel" + p);
 		    proccess(n, level);
 
 		} else if (n.status == PointStatus.U) {
@@ -88,27 +64,30 @@ public class CCTops {
 		}
 	    }
 
-	    p.status = PointStatus.A;
+	    // p.status = PointStatus.A;
 	    // print();
-	    p.status = PointStatus.P;
+	    // p.status = PointStatus.P;
 
 	    queue.remove(p);
 
 	}
 	int m = level - 1;
-	LOGGER.debug("m : " + m);
+	// LOGGER.debug("m : " + m);
 	while (m >= 0 && (quegeMap.get(m) == null || quegeMap.get(m).isEmpty())) {
 	    m--;
 	}
-	LOGGER.debug("LEVEL " + level);
+	// LOGGER.debug("LEVEL " + level);
 	if (m >= 0) {
-	    LOGGER.debug("Parent " + level + "," + number_nodes.get(level) + "<- C " + m + "," + number_nodes.get(m));
-	    // parent(Clevel,numbernodes(level)) = C m, numbernodes(m) level
-	    // M =parent, child=levelu "#" + label;
+	    // LOGGER.debug("Parent " + level + "," + number_nodes.get(level) +
+	    // "<- C " + m + "," + number_nodes.get(m));
 	    ConnectedComponentsTree parent = getNode(m, "parent");
 	    ConnectedComponentsTree child = getNode(level, "child");
-	    parent.getNodes().put(number_nodes.get(level), child);
-	    parent.print("");
+
+	    if (!child.getPoints().isEmpty()) {
+		parent.getNodes().put(number_nodes.get(level), child);
+
+	    }
+	    // parent.print("");
 	    cct = parent;
 
 	} else {
@@ -116,7 +95,6 @@ public class CCTops {
 	}
 
 	increaseNumberNodes(level);
-	printLabels();
 	return m;
     }
 
@@ -124,13 +102,15 @@ public class CCTops {
 	String key = level + "#" + number_nodes.get(level);
 	ConnectedComponentsTree node = createdNodes.get(key);
 	if (node == null) {
-	    LOGGER.debug("created " + key + " - " + msg);
+	    // LOGGER.debug("created " + key + " - " + msg);
 	    node = new ConnectedComponentsTree(level, number_nodes.get(level));
 	    createdNodes.put(key, node);
 	}
 	return node;
     }
 
+    // ------------------------- HELP FUNCTIONS
+    // --------------------------------------
     private List<Point> getNeigb(Point p) {
 
 	List<Point> neigb = new ArrayList<>();
@@ -169,36 +149,28 @@ public class CCTops {
 
     }
 
-    private void print() {
-	System.out.println();
-
-	for (int col = 0; col < points[0].length; col++) {
-	    System.out.printf("%03d|", col);
-
-	}
-	System.out
-		.println("\n-----------------------------------------------------------------------------------------");
-	for (int row = 0; row < points.length; row++) {
-	    for (int col = 0; col < points[0].length; col++) {
-		System.out.print(points[row][col].value + "|");
-
+    // ------------------------------- INIT
+    // ---------------------------------------------
+    private void initPoints(Mat initMat) {
+	points = new Point[initMat.rows()][initMat.cols()];
+	for (int row = 0; row < initMat.rows(); row++) {
+	    for (int col = 0; col < initMat.cols(); col++) {
+		Point p = new Point();
+		p.x = row;
+		p.y = col;
+		p.status = PointStatus.U;
+		p.value = Double.valueOf(initMat.get(row, col)[0]).intValue();
+		points[row][col] = p;
 	    }
-	    System.out.print("  ");
-	    for (int col = 0; col < points[0].length; col++) {
-		System.out.print(points[row][col].status + "|");
-
-	    }
-	    System.out.println();
 	}
+
     }
 
-    private void printLabels() {
-	for (int i = 0; i < number_nodes.size(); i++) {
-	    if (number_nodes.get(i) > 0) {
-		System.out.print(i + "=" + number_nodes.get(i) + ", ");
-	    }
+    private void initNumberNodes(int layerCount) {
+	for (int i = 0; i < layerCount; i++) {
+	    number_nodes.put(i, 0);
 	}
-	System.out.println();
+
     }
 
 }

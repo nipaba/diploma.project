@@ -7,9 +7,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.log4j.Logger;
-import org.opencv.imgcodecs.Imgcodecs;
-
-import com.nesvadba.tomas.celldetection.domain.ImageFile;
 
 public class FolderLoader {
 
@@ -33,7 +30,7 @@ public class FolderLoader {
 	allFiles.addAll(FileUtils.listFiles(folder, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE));
 
 	return (filterSuportedFiles(allFiles));
-	
+
     }
 
     private static List<File> filterSuportedFiles(List<File> files) {
@@ -48,6 +45,7 @@ public class FolderLoader {
 	return suported;
     }
 
+    // TODO - Add other files
     private static boolean isSupportedExt(File f) {
 	boolean isPng = f.getName().endsWith(".png");
 	boolean isTif = f.getName().endsWith(".tif");

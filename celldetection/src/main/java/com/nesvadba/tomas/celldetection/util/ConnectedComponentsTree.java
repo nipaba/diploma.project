@@ -2,10 +2,14 @@ package com.nesvadba.tomas.celldetection.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+
+import com.nesvadba.tomas.celldetection.enums.ComponentProperty;
 
 public class ConnectedComponentsTree {
 
@@ -14,8 +18,10 @@ public class ConnectedComponentsTree {
     private int level;
     private int label;
 
-    private List<Point> points = new ArrayList<>();
+    private Set<Point> points = new HashSet<>();
     private Map<Integer, ConnectedComponentsTree> nodes = new HashMap<>();
+
+    private Map<ComponentProperty, Integer> properties = new HashMap<>();
 
     public ConnectedComponentsTree(int nodeLevel, Integer nodeLabel) {
 	label = nodeLabel;
@@ -71,11 +77,11 @@ public class ConnectedComponentsTree {
 	this.label = label;
     }
 
-    public List<Point> getPoints() {
+    public Set<Point> getPoints() {
 	return points;
     }
 
-    public void setPoints(List<Point> points) {
+    public void setPoints(Set<Point> points) {
 	this.points = points;
     }
 
@@ -98,8 +104,42 @@ public class ConnectedComponentsTree {
 	}
     }
 
+    public void printPoints() {
+	LOGGER.debug("POINTS : " + getCode() + points);
+	for (ConnectedComponentsTree node : nodes.values()) {
+	    node.printPoints();
+	}
+
+    }
+
     public String getCode() {
 	return level + "#" + label;
+    }
+
+    public void recalculateProperties() {
+	// size
+	// roundness
+	// ...
+	List<Point> allPoints = getAllPointsOfLevel();
+	calculateSize(allPoints);
+    }
+
+    private void calculateSize(List<Point> allPoints) {
+
+	properties.put(ComponentProperty.SIZE, allPoints.size());
+	LOGGER.debug("SIZE" + getCode() + "   " + properties.get(ComponentProperty.SIZE));
+    }
+
+    // Ziskame vsechny componenty s body
+    public List<Point> getAllPointsOfLevel() {
+	List<Point> allPoints = new ArrayList<>();
+	allPoints.addAll(points);
+	if (!nodes.isEmpty()) {
+	    for (ConnectedComponentsTree node : nodes.values()) {
+		allPoints.addAll(node.getAllPointsOfLevel());
+	    }
+	}
+	return allPoints;
     }
 
 }

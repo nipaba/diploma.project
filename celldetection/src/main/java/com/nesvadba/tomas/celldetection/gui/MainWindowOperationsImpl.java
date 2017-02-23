@@ -16,7 +16,6 @@ import org.opencv.imgcodecs.Imgcodecs;
 
 import com.nesvadba.tomas.celldetection.converter.ImgConverter;
 import com.nesvadba.tomas.celldetection.domain.ImageFile;
-import com.nesvadba.tomas.celldetection.domain.ImageStats;
 import com.nesvadba.tomas.celldetection.enums.ImageType;
 import com.nesvadba.tomas.celldetection.util.FolderLoader;
 import com.nesvadba.tomas.celldetection.util.ImageOps;
@@ -118,22 +117,6 @@ public class MainWindowOperationsImpl {
 	Mat mat = ImageOps.denoise(file.getData().get(ImageType.INITIAL));
 	file.getData().put(ImageType.DENOISE, mat);
 	return new ImageIcon(ImgConverter.Mat2BufferedImage(mat));
-    }
-
-    public void proccessBasic(ImageFile file) {
-
-	Mat init = file.getData().get(ImageType.INITIAL);
-
-	ImageStats stats = ImageOps.getBasicSegmentation(init);
-
-	Mat segmented = stats.getSegmentedImg();
-	Mat labels = stats.getLabels();
-
-	file.getData().put(ImageType.SEGMENTED, segmented);
-	file.getData().put(ImageType.LABELS, labels);
-
-	file.setYeasts(stats.getYeasts());
-
     }
 
 }

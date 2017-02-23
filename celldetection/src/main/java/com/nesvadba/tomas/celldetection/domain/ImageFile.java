@@ -1,9 +1,7 @@
 package com.nesvadba.tomas.celldetection.domain;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.opencv.core.Mat;
@@ -20,7 +18,6 @@ public class ImageFile {
     private File file;
     private String cutRegion;
 
-    private List<Yeast> yeasts = new ArrayList<>();
     private Map<ImageType, Mat> data = new HashMap<>();
 
     public File getFile() {
@@ -29,14 +26,6 @@ public class ImageFile {
 
     public void setFile(File file) {
 	this.file = file;
-    }
-
-    public List<Yeast> getYeasts() {
-	return yeasts;
-    }
-
-    public void setYeasts(List<Yeast> yeasts) {
-	this.yeasts = yeasts;
     }
 
     public String getCutRegion() {
@@ -49,7 +38,7 @@ public class ImageFile {
 
     @Override
     public String toString() {
-	return "ImageFile{" + "file=" + file + ", yeasts=" + yeasts + ", cutRegion=" + cutRegion + '}';
+	return "ImageFile [file=" + file + ", cutRegion=" + cutRegion + ", data=" + data + "]";
     }
 
     public Map<ImageType, Mat> getData() {

@@ -20,7 +20,7 @@ import org.opencv.imgproc.Imgproc;
 
 import com.nesvadba.tomas.celldetection.domain.ImageFile;
 import com.nesvadba.tomas.celldetection.enums.ImageType;
-import com.nesvadba.tomas.celldetection.util.CCTops;
+import com.nesvadba.tomas.celldetection.util.CCTGenerator;
 
 /**
  *
@@ -215,7 +215,7 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BasicActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_BasicActionPerformed
-	CCTops a = new CCTops();
+	CCTGenerator a = new CCTGenerator();
 	a.temp(initMat);
     }// GEN-LAST:event_BasicActionPerformed
 

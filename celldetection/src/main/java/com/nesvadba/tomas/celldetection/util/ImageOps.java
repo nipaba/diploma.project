@@ -9,9 +9,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import com.nesvadba.tomas.celldetection.domain.ImageStats;
-import com.nesvadba.tomas.celldetection.domain.Yeast;
-
+// TODO -  REMOVE ?
 public class ImageOps {
 
     private static final Logger LOGGER = Logger.getLogger(ImageOps.class);
@@ -85,37 +83,40 @@ public class ImageOps {
 	return dst;
     }
 
-    public static ImageStats getBasicSegmentation(Mat src) {
-	Long startTime = System.currentTimeMillis();
-
-	Mat gray = new Mat(src.size(), CvType.CV_8UC3);
-
-	Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY);
-
-	Mat denoise = new Mat();
-	Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)), 5);
-
-	Mat bin = new Mat();
-	Imgproc.threshold(denoise, bin, 0, 255, Imgproc.THRESH_TRIANGLE + Imgproc.THRESH_BINARY);
-
-	Mat dst = distanceTransform(invert(bin));
-	dst.convertTo(dst, CvType.CV_8UC1);
-
-	Mat topHap = new Mat();
-	Imgproc.morphologyEx(bin, topHap, Imgproc.MORPH_ERODE, Mat.ones(new Size(3, 3), CvType.CV_8U));
-
-	Core.absdiff(bin, topHap, topHap);
-
-	Mat segmentedOrig = new Mat();
-	Core.add(topHap, gray, segmentedOrig, new Mat(), CvType.CV_8UC3);
-	double maxSum = Core.norm(segmentedOrig, Core.NORM_INF);
-
-	ImageStats stats = getStats(bin);
-	stats.setSegmentedImg(dst);
-
-	LOGGER.debug("getFlou2Stats time :" + (System.currentTimeMillis() - startTime));
-	return stats;//
-    }
+    // public static ImageStats getBasicSegmentation(Mat src) {
+    // Long startTime = System.currentTimeMillis();
+    //
+    // Mat gray = new Mat(src.size(), CvType.CV_8UC3);
+    //
+    // Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY);
+    //
+    // Mat denoise = new Mat();
+    // Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)), 5);
+    //
+    // Mat bin = new Mat();
+    // Imgproc.threshold(denoise, bin, 0, 255, Imgproc.THRESH_TRIANGLE +
+    // Imgproc.THRESH_BINARY);
+    //
+    // Mat dst = distanceTransform(invert(bin));
+    // dst.convertTo(dst, CvType.CV_8UC1);
+    //
+    // Mat topHap = new Mat();
+    // Imgproc.morphologyEx(bin, topHap, Imgproc.MORPH_ERODE, Mat.ones(new
+    // Size(3, 3), CvType.CV_8U));
+    //
+    // Core.absdiff(bin, topHap, topHap);
+    //
+    // Mat segmentedOrig = new Mat();
+    // Core.add(topHap, gray, segmentedOrig, new Mat(), CvType.CV_8UC3);
+    // double maxSum = Core.norm(segmentedOrig, Core.NORM_INF);
+    //
+    // ImageStats stats = getStats(bin);
+    // stats.setSegmentedImg(dst);
+    //
+    // LOGGER.debug("getFlou2Stats time :" + (System.currentTimeMillis() -
+    // startTime));
+    // return stats;//
+    // }
 
     /**
      * Fuknce urcena k zistakni statistik o celém obrazu ve chvili kdy je
@@ -125,35 +126,35 @@ public class ImageOps {
      * @return
      * 
      */
-    public static ImageStats getStats(Mat src) {
-
-	Mat labels = new Mat();
-	Mat stats = new Mat();
-	Mat centroids = new Mat();
-	Imgproc.connectedComponentsWithStats(src, labels, stats, centroids);
-	labels.convertTo(labels, CvType.CV_8UC1);
-
-	ImageStats imageStats = new ImageStats();
-
-	for (int count = 0; count < stats.size().height; count++) {
-
-	    Yeast yeast = new Yeast();
-	    yeast.setId(count);
-	    yeast.getParametrs().put("CC_STAT_LEFT", stats.get(count, 0)[0]);
-	    yeast.getParametrs().put("CC_STAT_TOP", stats.get(count, 1)[0]);
-	    yeast.getParametrs().put("CC_STAT_WIDTH", stats.get(count, 2)[0]);
-	    yeast.getParametrs().put("CC_STAT_HEIGHT", stats.get(count, 3)[0]);
-	    yeast.getParametrs().put("CC_STAT_AREA", stats.get(count, 4)[0]);
-
-	    yeast.getParametrs().put("Centr X", centroids.get(count, 0)[0]);
-	    yeast.getParametrs().put("Centr Y", centroids.get(count, 1)[0]);
-
-	    imageStats.getYeasts().add(yeast);
-
-	}
-	imageStats.setLabels(labels);
-
-	return imageStats;
-    }
+    // public static ImageStats getStats(Mat src) {
+    //
+    // Mat labels = new Mat();
+    // Mat stats = new Mat();
+    // Mat centroids = new Mat();
+    // Imgproc.connectedComponentsWithStats(src, labels, stats, centroids);
+    // labels.convertTo(labels, CvType.CV_8UC1);
+    //
+    // ImageStats imageStats = new ImageStats();
+    //
+    // for (int count = 0; count < stats.size().height; count++) {
+    //
+    // Yeast yeast = new Yeast();
+    // yeast.setId(count);
+    // yeast.getParametrs().put("CC_STAT_LEFT", stats.get(count, 0)[0]);
+    // yeast.getParametrs().put("CC_STAT_TOP", stats.get(count, 1)[0]);
+    // yeast.getParametrs().put("CC_STAT_WIDTH", stats.get(count, 2)[0]);
+    // yeast.getParametrs().put("CC_STAT_HEIGHT", stats.get(count, 3)[0]);
+    // yeast.getParametrs().put("CC_STAT_AREA", stats.get(count, 4)[0]);
+    //
+    // yeast.getParametrs().put("Centr X", centroids.get(count, 0)[0]);
+    // yeast.getParametrs().put("Centr Y", centroids.get(count, 1)[0]);
+    //
+    // imageStats.getYeasts().add(yeast);
+    //
+    // }
+    // imageStats.setLabels(labels);
+    //
+    // return imageStats;
+    // }
 
 }

@@ -1,5 +1,6 @@
 package com.nesvadba.tomas.celldetection.enums;
 
+// TODO -  REMOVE
 public enum ImageType {
 
     SEGMENTED("Segmented"), LABELS("labels"), GRAYSCALE("grayscale"), INITIAL("init"), BINARY("binary"), ERODE(
