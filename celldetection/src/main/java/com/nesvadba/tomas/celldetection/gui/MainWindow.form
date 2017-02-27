@@ -160,15 +160,13 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BasicActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Component class="javax.swing.JButton" name="RecalculateBtn">
           <Properties>
-            <Property name="text" type="java.lang.String" value="jButton1"/>
+            <Property name="text" type="java.lang.String" value="Recalculate"/>
           </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="jButton2">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jButton2"/>
-          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="RecalculateBtnActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -196,7 +194,7 @@
         </Property>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new StatsPanel()"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new StatsPanel(this)"/>
       </AuxValues>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">

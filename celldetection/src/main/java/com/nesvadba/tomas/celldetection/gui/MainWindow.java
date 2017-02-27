@@ -6,7 +6,9 @@
 package com.nesvadba.tomas.celldetection.gui;
 
 import java.util.List;
+import java.util.Map;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
@@ -18,9 +20,13 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import com.nesvadba.tomas.celldetection.converter.ImgConverter;
 import com.nesvadba.tomas.celldetection.domain.ImageFile;
+import com.nesvadba.tomas.celldetection.enums.FilterProps;
 import com.nesvadba.tomas.celldetection.enums.ImageType;
+import com.nesvadba.tomas.celldetection.util.CCTFilter;
 import com.nesvadba.tomas.celldetection.util.CCTGenerator;
+import com.nesvadba.tomas.celldetection.util.ConnectedComponentsTree;
 
 /**
  *
@@ -33,6 +39,9 @@ public class MainWindow extends javax.swing.JFrame {
 
     private Mat initMat;
     private static final Logger LOGGER = Logger.getLogger(MainWindow.class);
+
+    private ConnectedComponentsTree cct;
+    private CCTFilter filter = new CCTFilter();
 
     /**
      * // * Creates new form MainWindow
@@ -54,16 +63,16 @@ public class MainWindow extends javax.swing.JFrame {
 	Mat gray = new Mat(init.size(), CvType.CV_8UC3);
 	Imgproc.cvtColor(init, gray, Imgproc.COLOR_RGB2GRAY);
 
-	Mat denoise = new Mat();
-	Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)), 5);
-
 	Mat dst = new Mat();
 	Mat ones = Mat.ones(init.size(), CvType.CV_8U);
 	ones.setTo(new Scalar(255.0), ones);
-	Core.absdiff(ones, denoise, dst);
+	Core.absdiff(ones, gray, dst);
 	dst.convertTo(dst, CvType.CV_8U);
 
-	// canvas.setIcon(new ImageIcon(ImgConverter.Mat2BufferedImage(dst)));
+	Mat denoise = new Mat();
+	Imgproc.GaussianBlur(gray, denoise, new Size(new Point(15.0, 15.0)), 5);
+
+	canvas.setIcon(new ImageIcon(ImgConverter.mat2BufferedImage(dst)));
 
 	initMat = dst;
     }
@@ -84,16 +93,18 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
 	canvas = new javax.swing.JLabel();
 	controlPanel = new javax.swing.JPanel();
 	Basic = new javax.swing.JButton();
-	jButton1 = new javax.swing.JButton();
-	jButton2 = new javax.swing.JButton();
+	RecalculateBtn = new javax.swing.JButton();
 	filePanel = new FilePanel();
-	statsPanel = new StatsPanel();
+	statsPanel = new StatsPanel(this);
 	jMenuBar1 = new javax.swing.JMenuBar();
 	jMenu1 = new javax.swing.JMenu();
 	miOpenFile = new javax.swing.JMenuItem();
@@ -130,11 +141,14 @@ public class MainWindow extends javax.swing.JFrame {
 	});
 	controlPanel.add(Basic);
 
-	jButton1.setText("jButton1");
-	controlPanel.add(jButton1);
-
-	jButton2.setText("jButton2");
-	controlPanel.add(jButton2);
+	RecalculateBtn.setText("Recalculate");
+	RecalculateBtn.addActionListener(new java.awt.event.ActionListener() {
+	    @Override
+	    public void actionPerformed(java.awt.event.ActionEvent evt) {
+		RecalculateBtnActionPerformed(evt);
+	    }
+	});
+	controlPanel.add(RecalculateBtn);
 
 	getContentPane().add(controlPanel, java.awt.BorderLayout.PAGE_END);
 
@@ -214,9 +228,24 @@ public class MainWindow extends javax.swing.JFrame {
 	pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void filterBtnActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_filterBtnActionPerformed
+
+	Mat mat = ImgConverter.setToMat(initMat.size(), filter.filterByProperties(cct, null));
+	canvas.setIcon(new ImageIcon(ImgConverter.mat2BufferedImage(mat)));
+    }// GEN-LAST:event_filterBtnActionPerformed
+
+    private void RecalculateBtnActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_RecalculateBtnActionPerformed
+
+	cct.recalculateProperties();
+	Mat mat = ImgConverter.setToMat(initMat.size(), cct.getAllPoints());
+	canvas.setIcon(new ImageIcon(ImgConverter.mat2BufferedImage(mat)));
+
+    }// GEN-LAST:event_RecalculateBtnActionPerformed
+
     private void BasicActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_BasicActionPerformed
-	CCTGenerator a = new CCTGenerator();
-	a.temp(initMat);
+	CCTGenerator cctGenerator = new CCTGenerator();
+	cct = cctGenerator.createCCT(initMat);
+
     }// GEN-LAST:event_BasicActionPerformed
 
     private void miExportToCSVActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportToCSVActionPerformed
@@ -284,11 +313,10 @@ public class MainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Basic;
+    private javax.swing.JButton RecalculateBtn;
     private javax.swing.JLabel canvas;
     private javax.swing.JPanel controlPanel;
     private javax.swing.JPanel filePanel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -330,6 +358,11 @@ public class MainWindow extends javax.swing.JFrame {
 
     public void setjMenuBar1(javax.swing.JMenuBar jMenuBar1) {
 	this.jMenuBar1 = jMenuBar1;
+    }
+
+    void refilter(Map<FilterProps, Integer> filterProperties) {
+	Mat mat = ImgConverter.setToMat(initMat.size(), filter.filterByProperties(cct, filterProperties));
+	canvas.setIcon(new ImageIcon(ImgConverter.mat2BufferedImage(mat)));
     }
 
 }

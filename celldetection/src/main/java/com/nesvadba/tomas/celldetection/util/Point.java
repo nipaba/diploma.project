@@ -1,11 +1,13 @@
 package com.nesvadba.tomas.celldetection.util;
 
+import com.nesvadba.tomas.celldetection.enums.PointStatus;
+
 public class Point {
 
-    int x;
-    int y;
-    PointStatus status;
-    int value;
+    public int x;
+    public int y;
+    public PointStatus status;
+    public int value;
 
     @Override
     public String toString() {

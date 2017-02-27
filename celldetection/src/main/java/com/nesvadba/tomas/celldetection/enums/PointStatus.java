@@ -1,4 +1,4 @@
-package com.nesvadba.tomas.celldetection.util;
+package com.nesvadba.tomas.celldetection.enums;
 
 public enum PointStatus {
 

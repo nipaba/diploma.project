@@ -10,6 +10,9 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.opencv.core.Mat;
 
+import com.nesvadba.tomas.celldetection.converter.ImgConverter;
+import com.nesvadba.tomas.celldetection.enums.PointStatus;
+
 public class CCTGenerator {
 
     private static final Logger LOGGER = Logger.getLogger(CCTGenerator.class);
@@ -21,16 +24,18 @@ public class CCTGenerator {
 
     private ConnectedComponentsTree cct = null;
 
-    public ConnectedComponentsTree temp(Mat initMat) {
+    public ConnectedComponentsTree createCCT(Mat inputMat) {
 
-	initPoints(initMat);
+	points = ImgConverter.mat2Array(inputMat);
 	initNumberNodes(256);
 
 	long startTime = System.currentTimeMillis();
 	proccess(points[0][0], 0);
 	LOGGER.debug("Proccessing time: " + (System.currentTimeMillis() - startTime));
-	LOGGER.debug("Image Size : " + initMat.rows() * initMat.cols());
-
+	LOGGER.debug("Image Size : " + inputMat.rows() * inputMat.cols());
+	LOGGER.debug("Nodes : " + cct.getNodeCount());
+	LOGGER.debug("Points count:" + cct.getAllPoints().size());
+	LOGGER.debug("Created nodes" + createdNodes.size());
 	return cct;
     }
 
@@ -39,24 +44,26 @@ public class CCTGenerator {
 	int m = p.value;
 	addToQueue(p);
 	while (m >= level) {
+	    // print();
 	    m = flood(m);
+
 	}
     }
 
     private int flood(int level) {
-	// LOGGER.debug("**********************************************************************************");
-	// LOGGER.debug("LEVEL " + level);
-	// print();
+	LOGGER.debug("**********************************************************************************");
+	LOGGER.debug("LEVEL " + level);
 	Queue<Point> queue = quegeMap.get(level);
 
 	while (!queue.isEmpty()) {
 	    Point p = queue.peek();
 	    getNode(level, "point" + p).getPoints().add(p);
+
 	    // get All Neigborous
 	    for (Point n : getNeigb(p)) {
 
 		if (n.value > p.value && n.status == PointStatus.U) {
-		    // LOGGER.debug("Found upperLevel" + p);
+		    LOGGER.debug("Found upperLevel" + p);
 		    proccess(n, level);
 
 		} else if (n.status == PointStatus.U) {
@@ -64,22 +71,19 @@ public class CCTGenerator {
 		}
 	    }
 
-	    // p.status = PointStatus.A;
-	    // print();
-	    // p.status = PointStatus.P;
+	    p.status = PointStatus.P;
 
 	    queue.remove(p);
 
 	}
 	int m = level - 1;
-	// LOGGER.debug("m : " + m);
+	LOGGER.debug("m : " + m);
 	while (m >= 0 && (quegeMap.get(m) == null || quegeMap.get(m).isEmpty())) {
 	    m--;
 	}
-	// LOGGER.debug("LEVEL " + level);
+	LOGGER.debug("LEVEL " + level);
 	if (m >= 0) {
-	    // LOGGER.debug("Parent " + level + "," + number_nodes.get(level) +
-	    // "<- C " + m + "," + number_nodes.get(m));
+	    LOGGER.debug("Parent " + level + "," + number_nodes.get(level) + "<- C " + m + "," + number_nodes.get(m));
 	    ConnectedComponentsTree parent = getNode(m, "parent");
 	    ConnectedComponentsTree child = getNode(level, "child");
 
@@ -87,7 +91,7 @@ public class CCTGenerator {
 		parent.getNodes().put(number_nodes.get(level), child);
 
 	    }
-	    // parent.print("");
+	    parent.print("");
 	    cct = parent;
 
 	} else {
@@ -102,7 +106,7 @@ public class CCTGenerator {
 	String key = level + "#" + number_nodes.get(level);
 	ConnectedComponentsTree node = createdNodes.get(key);
 	if (node == null) {
-	    // LOGGER.debug("created " + key + " - " + msg);
+	    LOGGER.debug("created " + key + " - " + msg);
 	    node = new ConnectedComponentsTree(level, number_nodes.get(level));
 	    createdNodes.put(key, node);
 	}
@@ -151,26 +155,34 @@ public class CCTGenerator {
 
     // ------------------------------- INIT
     // ---------------------------------------------
-    private void initPoints(Mat initMat) {
-	points = new Point[initMat.rows()][initMat.cols()];
-	for (int row = 0; row < initMat.rows(); row++) {
-	    for (int col = 0; col < initMat.cols(); col++) {
-		Point p = new Point();
-		p.x = row;
-		p.y = col;
-		p.status = PointStatus.U;
-		p.value = Double.valueOf(initMat.get(row, col)[0]).intValue();
-		points[row][col] = p;
-	    }
-	}
-
-    }
 
     private void initNumberNodes(int layerCount) {
 	for (int i = 0; i < layerCount; i++) {
 	    number_nodes.put(i, 0);
 	}
 
+    }
+
+    private void print() {
+	System.out.println();
+
+	for (int col = 0; col < points[0].length; col++) {
+	    System.out.printf("%03d|", col);
+
+	}
+	System.out
+		.println("\n-----------------------------------------------------------------------------------------");
+	for (int row = 0; row < points.length; row++) {
+	    for (int col = 0; col < points[0].length; col++) {
+		System.out.printf("%03d|", points[row][col].value);
+
+	    }
+	    System.out.print("  ");
+	    for (int col = 0; col < points[0].length; col++) {
+		System.out.print(points[row][col].status + "|");
+	    }
+	    System.out.println();
+	}
     }
 
 }

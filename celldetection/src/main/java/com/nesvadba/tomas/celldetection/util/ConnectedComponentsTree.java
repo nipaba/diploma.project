@@ -1,9 +1,7 @@
 package com.nesvadba.tomas.celldetection.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,45 +18,11 @@ public class ConnectedComponentsTree {
 
     private Set<Point> points = new HashSet<>();
     private Map<Integer, ConnectedComponentsTree> nodes = new HashMap<>();
-
     private Map<ComponentProperty, Integer> properties = new HashMap<>();
 
     public ConnectedComponentsTree(int nodeLevel, Integer nodeLabel) {
 	label = nodeLabel;
 	level = nodeLevel;
-    }
-
-    public ConnectedComponentsTree insertLeafToNode(int leafLevel, Integer leafLabel, int nodeLevel,
-	    Integer nodeLabel) {
-
-	ConnectedComponentsTree parent = findNode(nodeLevel, nodeLabel);
-	if (parent == null) {
-	    parent = new ConnectedComponentsTree(nodeLevel, nodeLabel);
-	}
-
-	ConnectedComponentsTree child = findNode(leafLevel, leafLabel);
-	if (child == null) {
-	    child = new ConnectedComponentsTree(leafLevel, leafLabel);
-	}
-	parent.getNodes().put(leafLabel, child);
-
-	return parent;
-    }
-
-    private ConnectedComponentsTree findNode(int nodeLevel, int nodeLabel) {
-
-	if (level == nodeLevel && label == nodeLabel) {
-	    return this;
-	} else {
-	    ConnectedComponentsTree cctSearched = null;
-	    for (ConnectedComponentsTree node : nodes.values()) {
-		cctSearched = node.findNode(nodeLevel, nodeLabel);
-		if (cctSearched != null)
-		    return cctSearched;
-	    }
-	}
-
-	return null;
     }
 
     public int getLevel() {
@@ -93,6 +57,79 @@ public class ConnectedComponentsTree {
 	this.nodes = nodes;
     }
 
+    public Map<ComponentProperty, Integer> getProperties() {
+	return properties;
+    }
+
+    public void setProperties(Map<ComponentProperty, Integer> properties) {
+	this.properties = properties;
+    }
+
+    // ========================================================================================
+    // CUSTOM
+    // ========================================================================================
+    public String getCode() {
+	return level + "#" + label;
+    }
+
+    public Set<Point> getAllPoints() {
+	Set<Point> allPoints = new HashSet<>();
+	allPoints.addAll(points);
+	if (!nodes.isEmpty()) {
+	    for (ConnectedComponentsTree node : nodes.values()) {
+		allPoints.addAll(node.getAllPoints());
+	    }
+	}
+	return allPoints;
+    }
+
+    public Set<ConnectedComponentsTree> getAllNodes() {
+
+	Set<ConnectedComponentsTree> allNodes = new HashSet<>();
+	allNodes.add(this);
+	if (!nodes.isEmpty()) {
+	    for (ConnectedComponentsTree node : nodes.values()) {
+		allNodes.addAll(node.getAllNodes());
+	    }
+	}
+	return allNodes;
+
+    }
+
+    public int getNodeCount() {
+	int count = 1;
+
+	if (!nodes.isEmpty()) {
+	    for (ConnectedComponentsTree node : nodes.values()) {
+		count += node.getNodeCount();
+	    }
+	}
+	return count;
+
+    }
+
+    // ========================================================================================
+    // CALCULATION
+    // ========================================================================================
+    public Set<Point> recalculateProperties() {
+	Set<Point> allPoints = new HashSet<>();
+	allPoints.addAll(points);
+	if (!nodes.isEmpty()) {
+	    for (ConnectedComponentsTree node : nodes.values()) {
+		allPoints.addAll(node.recalculateProperties());
+	    }
+	}
+
+	CCTEvaluator.evaluatePropertiest(allPoints, properties);
+
+	// LOGGER.debug(properties);
+	return allPoints;
+
+    }
+
+    // ========================================================================================
+    // Printing
+    // ========================================================================================
     public void print(String str) {
 	String thisLevel = "[" + level + "|" + label + "/" + nodes.size() + "]";
 	if (nodes.size() == 0) {
@@ -111,35 +148,4 @@ public class ConnectedComponentsTree {
 	}
 
     }
-
-    public String getCode() {
-	return level + "#" + label;
-    }
-
-    public void recalculateProperties() {
-	// size
-	// roundness
-	// ...
-	List<Point> allPoints = getAllPointsOfLevel();
-	calculateSize(allPoints);
-    }
-
-    private void calculateSize(List<Point> allPoints) {
-
-	properties.put(ComponentProperty.SIZE, allPoints.size());
-	LOGGER.debug("SIZE" + getCode() + "   " + properties.get(ComponentProperty.SIZE));
-    }
-
-    // Ziskame vsechny componenty s body
-    public List<Point> getAllPointsOfLevel() {
-	List<Point> allPoints = new ArrayList<>();
-	allPoints.addAll(points);
-	if (!nodes.isEmpty()) {
-	    for (ConnectedComponentsTree node : nodes.values()) {
-		allPoints.addAll(node.getAllPointsOfLevel());
-	    }
-	}
-	return allPoints;
-    }
-
 }

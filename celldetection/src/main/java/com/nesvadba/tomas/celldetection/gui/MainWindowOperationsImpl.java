@@ -67,9 +67,9 @@ public class MainWindowOperationsImpl {
 	if (imageFile.getData().isEmpty()) {
 	    Mat image = Imgcodecs.imread(imageFile.getFile().getAbsolutePath());
 	    imageFile.getData().put(ImageType.INITIAL, image);
-	    imageIcon = new ImageIcon(ImgConverter.Mat2BufferedImage(image));
+	    imageIcon = new ImageIcon(ImgConverter.mat2BufferedImage(image));
 	} else {
-	    imageIcon = new ImageIcon(ImgConverter.Mat2BufferedImage(imageFile.getData().get(ImageType.INITIAL)));
+	    imageIcon = new ImageIcon(ImgConverter.mat2BufferedImage(imageFile.getData().get(ImageType.INITIAL)));
 	}
 	LOGGER.debug("Data for image loaded [" + imageFile.getFile().getAbsolutePath() + "]");
 
@@ -80,43 +80,43 @@ public class MainWindowOperationsImpl {
     public ImageIcon getGrayScaleImage(ImageFile file) {
 	Mat mat = ImageOps.getGrayScale(file.getData().get(ImageType.DENOISE));
 	file.getData().put(ImageType.GRAYSCALE, mat);
-	return new ImageIcon(ImgConverter.Mat2BufferedImage(mat));
+	return new ImageIcon(ImgConverter.mat2BufferedImage(mat));
     }
 
     public ImageIcon getBinaryImage(ImageFile file) {
 	Mat mat = ImageOps.getTriangleTreshold(file.getData().get(ImageType.GRAYSCALE));
 	file.getData().put(ImageType.BINARY, mat);
-	return new ImageIcon(ImgConverter.Mat2BufferedImage(mat));
+	return new ImageIcon(ImgConverter.mat2BufferedImage(mat));
     }
 
     public ImageIcon getCloseImage(ImageFile file) {
 	Mat mat = ImageOps.closing(file.getData().get(ImageType.BINARY));
 	file.getData().put(ImageType.CLOSE, mat);
-	return new ImageIcon(ImgConverter.Mat2BufferedImage(mat));
+	return new ImageIcon(ImgConverter.mat2BufferedImage(mat));
     }
 
     public ImageIcon getOpenImage(ImageFile file) {
 	Mat mat = ImageOps.openening(file.getData().get(ImageType.BINARY));
 	file.getData().put(ImageType.CLOSE, mat);
-	return new ImageIcon(ImgConverter.Mat2BufferedImage(mat));
+	return new ImageIcon(ImgConverter.mat2BufferedImage(mat));
     }
 
     public ImageIcon getDilateImage(ImageFile file) {
 	Mat mat = ImageOps.dilation(file.getData().get(ImageType.BINARY));
 	file.getData().put(ImageType.CLOSE, mat);
-	return new ImageIcon(ImgConverter.Mat2BufferedImage(mat));
+	return new ImageIcon(ImgConverter.mat2BufferedImage(mat));
     }
 
     public ImageIcon getErodeImage(ImageFile file) {
 	Mat mat = ImageOps.erosion(file.getData().get(ImageType.BINARY));
 	file.getData().put(ImageType.CLOSE, mat);
-	return new ImageIcon(ImgConverter.Mat2BufferedImage(mat));
+	return new ImageIcon(ImgConverter.mat2BufferedImage(mat));
     }
 
     public ImageIcon getDenoisedImage(ImageFile file) {
 	Mat mat = ImageOps.denoise(file.getData().get(ImageType.INITIAL));
 	file.getData().put(ImageType.DENOISE, mat);
-	return new ImageIcon(ImgConverter.Mat2BufferedImage(mat));
+	return new ImageIcon(ImgConverter.mat2BufferedImage(mat));
     }
 
 }
